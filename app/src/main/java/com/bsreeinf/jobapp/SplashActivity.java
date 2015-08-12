@@ -283,6 +283,8 @@ public class SplashActivity extends Activity {
                 Log.d(TAG, "Init request failed");
             if (Commons.SHOW_TOAST_MSGS)
                 Toast.makeText(context, "Login request failed", Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "Wrong email / password", Toast.LENGTH_LONG).show();
+            txtEmail.requestFocus();
         }
     }
 

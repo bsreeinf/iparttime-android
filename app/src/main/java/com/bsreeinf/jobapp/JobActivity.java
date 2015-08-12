@@ -3,6 +3,10 @@ package com.bsreeinf.jobapp;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Paint;
+import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -27,6 +31,7 @@ public class JobActivity extends Activity {
     private String user_id;
     private Context context;
     private int position = 0;
+    private Typeface font, fontBold;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,13 +41,32 @@ public class JobActivity extends Activity {
         user_id = JobsActivity.user_id;
         context = this;
         position = getIntent().getIntExtra("position", 0);
+        font = Typeface.createFromAsset(context.getAssets(), "fonts/Raleway-Light.ttf");
+        fontBold = Typeface.createFromAsset(context.getAssets(), "fonts/Raleway-Bold.ttf");
 
-        TextView txtCompanyName = (TextView) findViewById(R.id.txtCompanyName);
-        TextView txtJobTitle = (TextView) findViewById(R.id.txtJobTitle);
-        TextView txtPostedOn = (TextView) findViewById(R.id.txtPostedOn);
-        TextView txtJobDescription = (TextView) findViewById(R.id.txtJobDescription);
-        TextView txtJobLocation = (TextView) findViewById(R.id.txtJobLocation);
-        TextView txtSalaryOffered = (TextView) findViewById(R.id.txtSalaryOffered);
+
+        final TextView txtCompanyName = (TextView) findViewById(R.id.txtCompanyName);
+        final TextView txtJobTitle = (TextView) findViewById(R.id.txtJobTitle);
+        final TextView txtPostedOn = (TextView) findViewById(R.id.txtPostedOn);
+        final TextView txtJobDescription = (TextView) findViewById(R.id.txtJobDescription);
+        final TextView txtJobLocation = (TextView) findViewById(R.id.txtJobLocation);
+        final TextView txtSalaryOffered = (TextView) findViewById(R.id.txtSalaryOffered);
+        final TextView txtContactName = (TextView) findViewById(R.id.txtContactName);
+        final TextView txtContactPhone = (TextView) findViewById(R.id.txtContactPhone);
+        final TextView txtContactEmail = (TextView) findViewById(R.id.txtContactEmail);
+
+        txtCompanyName.setTypeface(fontBold);
+        txtJobTitle.setTypeface(font);
+        txtPostedOn.setTypeface(font);
+        txtJobDescription.setTypeface(font);
+        txtJobLocation.setTypeface(font);
+        txtSalaryOffered.setTypeface(font);
+        txtContactName.setTypeface(fontBold);
+        txtContactPhone.setTypeface(font);
+        txtContactEmail.setTypeface(font);
+
+        txtContactPhone.setPaintFlags(txtContactPhone.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+        txtContactEmail.setPaintFlags(txtContactEmail.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
 
         Button btnSave = (Button) findViewById(R.id.btnSave);
         Button btnApply = (Button) findViewById(R.id.btnApply);
@@ -53,6 +77,32 @@ public class JobActivity extends Activity {
         txtJobDescription.setText(jobs.getJob(position).getJob_description());
         txtJobLocation.setText(Commons.locationList.getBlockByID(jobs.getJob(position).getLocation_city()).getTitle());
         txtSalaryOffered.setText("\u20B9 " + jobs.getJob(position).getSalary_offered());
+        txtContactName.setText(jobs.getJob(position).getContact_person_name());
+        txtContactPhone.setText(jobs.getJob(position).getContact_person_phone());
+        txtContactEmail.setText(jobs.getJob(position).getContact_person_email());
+
+        txtContactPhone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + txtContactPhone.getText().toString().trim()));
+                    startActivity(intent);
+                } catch (Exception e) {
+                    Toast.makeText(context, "Unable to dial txtContactPhone.getText().toString().trim()", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        txtContactEmail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
+                        "mailto", txtContactEmail.getText().toString(), null));
+//                emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Subject");
+//                emailIntent.putExtra(Intent.EXTRA_TEXT, "Body");
+                startActivity(Intent.createChooser(emailIntent, "Send email"));
+            }
+        });
 
         findViewById(R.id.btnDismiss).setOnClickListener(new View.OnClickListener() {
             @Override

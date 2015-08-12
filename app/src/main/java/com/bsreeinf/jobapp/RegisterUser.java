@@ -250,6 +250,7 @@ public class RegisterUser extends Activity {
                 Log.d(TAG, "Registration request failed");
             if (Commons.SHOW_TOAST_MSGS)
                 Toast.makeText(context, "Registration request failed", Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "Registration failed! Please try again.", Toast.LENGTH_LONG).show();
         }
     }
 
