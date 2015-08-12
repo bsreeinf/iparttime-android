@@ -1,0 +1,30 @@
+<resources>
+
+    <color name="black_overlay">#AA000000</color>
+    <color name="black_overlay_light">#33000000</color>
+    <color name="white_overlay">#66FFFFFF</color>
+
+    <color name="dark_gray">#4D4D4D</color>
+    <color name="light_gray">#A6A6A6</color>
+
+    <color name="pallet_purple_overlay">#77674172</color>
+    <color name="pallet_purple_overlay_dark">#776f1372</color>
+    <color name="pallet_turquoise_overlay">#771abc9c</color>
+    <color name="pallet_turquoise_overlay_dark">#77068e4f</color>
+
+    <color name="pallet_turquoise_light">#1abc9c</color>
+    <color name="pallet_turquoise_dark">#177156</color>
+
+    <color name="pallet_coral_red_light">#EC3458</color>
+    <!--e74c3c-->
+    <color name="pallet_coral_red_dark">#ffa22842</color>
+
+    <color name="pallet_turquoise_alpha">#661abc9c</color>
+    <color name="pallet_coral_red_alpha">#90EC3458</color>
+
+    <color name="white">#FFFFFF</color>
+    <color name="material_black">#212121</color>
+    <color name="material_red">#ff4444</color>
+    <color name="material_green">#4CAF50</color>
+
+</resources>
