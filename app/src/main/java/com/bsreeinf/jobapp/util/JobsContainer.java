@@ -66,7 +66,15 @@ public class JobsContainer {
             this.contact_person_name = objJob.get("contact_person_name").getAsString();
             this.contact_person_phone = objJob.get("contact_person_phone").getAsString();
             this.contact_person_email = objJob.get("contact_person_email").getAsString();
-            this.posted_date = objJob.get("posted_date").getAsString();
+            String UTCDate = Commons.getFormattedTimestamp(
+                    Commons.parseUTCToLocal(
+                            objJob.get("created_at")
+                                    .getAsString()
+                                    .replace('T', ' ')
+                                    .substring(0, 18)
+                    )
+            );
+            this.posted_date = UTCDate;
             this.is_online = objJob.get("is_online").getAsBoolean();
         }
 

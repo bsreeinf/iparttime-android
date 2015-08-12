@@ -15,7 +15,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp">
             <!--<ImageView-->
             <!--android:id="@+id/btnCloseFilter"-->
             <!--android:layout_width="35dp"-->
@@ -47,44 +49,30 @@
                     android:textStyle="bold" />
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/txtJobTitle"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:orientation="horizontal"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp">
+                android:layout_marginTop="3dp"
+                android:text="Job Title"
+                android:textColor="@color/pallet_coral_red_light"
+                android:textSize="20sp"
+                android:textStyle="italic" />
 
-                <TextView
-                    android:id="@+id/txtJobTitle"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="3dp"
-                    android:layout_weight="0.7"
-                    android:text="Job Title"
-                    android:textColor="@color/pallet_coral_red_light"
-                    android:textSize="20sp"
-                    android:textStyle="italic" />
-
-                <TextView
-                    android:id="@+id/txtPostedOn"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="3dp"
-                    android:layout_weight="0.3"
-                    android:gravity="right"
-                    android:text="Posted On"
-                    android:textColor="@color/pallet_coral_red_light"
-                    android:textSize="14sp" />
-            </LinearLayout>
+            <TextView
+                android:id="@+id/txtPostedOn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:text="Wed 12 Aug, 99:99"
+                android:textColor="@color/pallet_coral_red_light"
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/txtJobDescription"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
                 android:text="Job Description"
                 android:textColor="@color/pallet_coral_red_light"
                 android:textSize="16sp"
@@ -95,8 +83,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
                 android:text="Job Location"
                 android:textColor="@color/pallet_coral_red_light"
                 android:textSize="16sp" />
@@ -106,16 +92,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
                 android:text="Salary Offered"
                 android:textColor="@color/pallet_coral_red_light"
                 android:textSize="16sp" />
-
-
         </LinearLayout>
-
-
     </ScrollView>
 
     <LinearLayout
@@ -143,29 +123,30 @@
             android:textSize="18sp"
             android:textStyle="italic|bold" />
 
-        <TextView
-            android:id="@+id/txtContactPhone"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="3dp"
-            android:text="+91 12 3456 7890"
-            android:drawableLeft="@drawable/ic_icon_phone"
-            android:drawablePadding="6dp"
-            android:textColor="@color/pallet_coral_red_light"
-            android:textSize="18sp"
-            android:textStyle="italic" />
+        <!--<TextView-->
+        <!--android:id="@+id/txtContactPhone"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginBottom="5dp"-->
+        <!--android:layout_marginTop="5dp"-->
+        <!--android:drawableLeft="@drawable/ic_icon_phone"-->
+        <!--android:drawablePadding="6dp"-->
+        <!--android:text="+91 12 3456 7890"-->
+        <!--android:textColor="@color/pallet_coral_red_light"-->
+        <!--android:textSize="18sp"-->
+        <!--android:textStyle="italic" />-->
 
-        <TextView
-            android:id="@+id/txtContactEmail"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="3dp"
-            android:text="johndoe@dolaramet.com"
-            android:drawableLeft="@drawable/ic_icon_email"
-            android:drawablePadding="6dp"
-            android:textColor="@color/pallet_coral_red_light"
-            android:textSize="18sp"
-            android:textStyle="italic" />
+        <!--<TextView-->
+        <!--android:id="@+id/txtContactEmail"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginTop="3dp"-->
+        <!--android:drawableLeft="@drawable/ic_icon_email"-->
+        <!--android:drawablePadding="6dp"-->
+        <!--android:text="johndoe@dolaramet.com"-->
+        <!--android:textColor="@color/pallet_coral_red_light"-->
+        <!--android:textSize="18sp"-->
+        <!--android:textStyle="italic" />-->
 
     </LinearLayout>
 
@@ -176,43 +157,108 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:orientation="horizontal">
 
-            <Button
-                android:id="@+id/btnSave"
+            <LinearLayout
+                android:id="@+id/btnContactPhone"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="0.5"
-                android:background="@color/pallet_coral_red_light"
-                android:padding="10dp"
-                android:text="Save"
-                android:textColor="@color/white"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                android:background="@color/pallet_coral_red_dark">
 
-            <Button
-                android:id="@+id/btnApply"
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.5"
+                    android:padding="10dp"
+                    android:src="@drawable/ic_icon_phone_white" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/btnContactEmail"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.5"
-                android:background="@color/pallet_coral_red_dark"
-                android:padding="10dp"
-                android:text="Apply"
-                android:textColor="@color/white"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                android:layout_height="match_parent"
+                android:layout_weight="0.5">
+
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.5"
+                    android:background="@color/pallet_coral_red_light"
+                    android:padding="10dp"
+                    android:src="@drawable/ic_icon_email_white" />
+            </LinearLayout>
+
+            <!--<Button-->
+            <!--android:id="@+id/btnContactPhone"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:background="@color/pallet_coral_red_dark"-->
+            <!--android:padding="10dp"-->
+            <!--android:text="Save"-->
+            <!--android:textColor="@color/white"-->
+            <!--android:textSize="16sp"-->
+            <!--android:textStyle="bold" />-->
+
+            <!--<Button-->
+            <!--android:id="@+id/btnContactEmail"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:background="@color/pallet_coral_red_light"-->
+            <!--android:padding="10dp"-->
+            <!--android:text="Apply"-->
+            <!--android:textColor="@color/white"-->
+            <!--android:textSize="16sp"-->
+            <!--android:textStyle="bold" />-->
         </LinearLayout>
 
-        <Button
-            android:id="@+id/btnDismiss"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/pallet_turquoise_dark"
-            android:padding="10dp"
-            android:text="DONE"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            android:textStyle="bold" />
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnSave"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5"
+                    android:background="@color/pallet_coral_red_light"
+                    android:padding="10dp"
+                    android:text="Save"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/btnApply"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5"
+                    android:background="@color/pallet_coral_red_dark"
+                    android:padding="10dp"
+                    android:text="Apply"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!--<Button-->
+            <!--android:id="@+id/btnDismiss"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:background="@color/pallet_turquoise_dark"-->
+            <!--android:padding="10dp"-->
+            <!--android:text="DONE"-->
+            <!--android:textColor="@color/white"-->
+            <!--android:textSize="16sp"-->
+            <!--android:textStyle="bold"-->
+            <!--android:visibility="invisible"/>-->
+        </LinearLayout>
     </LinearLayout>
 </LinearLayout>

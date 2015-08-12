@@ -12,6 +12,12 @@
     <color name="pallet_turquoise_overlay">#771abc9c</color>
     <color name="pallet_turquoise_overlay_dark">#77068e4f</color>
 
+    <color name="spinner_color">#1abc9c</color>
+
+    <color name="tile_concrete">#ecf0f1</color>
+    <color name="tile_concrete_overlay">#46ecf0f1</color>
+
+
     <color name="pallet_turquoise_light">#1abc9c</color>
     <color name="pallet_turquoise_dark">#177156</color>
 

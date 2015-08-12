@@ -133,9 +133,10 @@ public class JobsActivity extends Activity {
 
         layoutFilter = (AnimatedLinearLayout) findViewById(R.id.layoutFilter);
         Animation inAnimation = AnimationUtils.loadAnimation(context, R.anim.abc_fade_in);
-        Animation outAnimation = AnimationUtils.loadAnimation(context, R.anim.abc_fade_out);
+//        Animation outAnimation = AnimationUtils.loadAnimation(context, R.anim.abc_fade_out);
         layoutFilter.setInAnimation(inAnimation);
-        layoutFilter.setOutAnimation(outAnimation);
+//        layoutFilter.setOutAnimation(outAnimation);
+
         viewCount = viewFlipper.getChildCount();
         refreshJobsList();
 
@@ -148,6 +149,17 @@ public class JobsActivity extends Activity {
                 txtTabHome.setTextColor(getResources().getColor(R.color.pallet_coral_red_light));
                 txtTabSaved.setTextColor(getResources().getColor(R.color.white));
                 txtTabProfile.setTextColor(getResources().getColor(R.color.white));
+
+                // hide filter first
+                if (layoutFilter.isShown()) {
+                    layoutFilter.setVisibility(View.GONE);
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                        imgTabFilter.setImageDrawable(getResources().getDrawable(R.drawable.ic_tab_filter_white));
+                    } else {
+                        imgTabFilter.setImageDrawable(getResources().getDrawable(R.drawable.ic_tab_filter_white, null));
+                    }
+                    return;
+                }
 
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
                     imgTabHome.setImageDrawable(getResources().getDrawable(R.drawable.ic_tab_home));
@@ -212,6 +224,17 @@ public class JobsActivity extends Activity {
                 txtTabHome.setTextColor(getResources().getColor(R.color.white));
                 txtTabProfile.setTextColor(getResources().getColor(R.color.white));
 
+                // hide filter first
+                if (layoutFilter.isShown()) {
+                    layoutFilter.setVisibility(View.GONE);
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                        imgTabFilter.setImageDrawable(getResources().getDrawable(R.drawable.ic_tab_filter_white));
+                    } else {
+                        imgTabFilter.setImageDrawable(getResources().getDrawable(R.drawable.ic_tab_filter_white, null));
+                    }
+                    return;
+                }
+
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
                     imgTabSaved.setImageDrawable(getResources().getDrawable(R.drawable.ic_tab_saved));
                     imgTabHome.setImageDrawable(getResources().getDrawable(R.drawable.ic_tab_home_white));
@@ -235,6 +258,17 @@ public class JobsActivity extends Activity {
                 txtTabProfile.setTextColor(getResources().getColor(R.color.pallet_coral_red_light));
                 txtTabSaved.setTextColor(getResources().getColor(R.color.white));
                 txtTabHome.setTextColor(getResources().getColor(R.color.white));
+
+                // hide filter first
+                if (layoutFilter.isShown()) {
+                    layoutFilter.setVisibility(View.GONE);
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                        imgTabFilter.setImageDrawable(getResources().getDrawable(R.drawable.ic_tab_filter_white));
+                    } else {
+                        imgTabFilter.setImageDrawable(getResources().getDrawable(R.drawable.ic_tab_filter_white, null));
+                    }
+                    return;
+                }
 
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
                     imgTabProfile.setImageDrawable(getResources().getDrawable(R.drawable.ic_tab_profile));
@@ -631,15 +665,15 @@ public class JobsActivity extends Activity {
             for (int i = 0; i < savedJobs.size(); i++) {
                 if (Commons.SHOW_DEBUG_MSGS)
                     Log.d(TAG, "Rendered saved job");
-                View rowView = LayoutInflater.from(context).inflate(R.layout.layout_job_purple, null);
+                View rowView = LayoutInflater.from(context).inflate(R.layout.layout_job_concrete, null);
 
-                lblJobTitle = (TextView) rowView.findViewById(R.id.lblJobTitle1);
-                lblJobLocation = (TextView) rowView.findViewById(R.id.lblJobLocation1);
-                lblPostDate = (TextView) rowView.findViewById(R.id.lblPostDate1);
+                lblJobTitle = (TextView) rowView.findViewById(R.id.lblJobTitle);
+                lblJobLocation = (TextView) rowView.findViewById(R.id.lblJobLocation);
+                lblPostDate = (TextView) rowView.findViewById(R.id.lblPostDate);
 
                 lblJobTitle.setTypeface(fontBold);
-                lblJobLocation.setTypeface(font);
-                lblPostDate.setTypeface(font);
+                lblJobLocation.setTypeface(fontBold);
+                lblPostDate.setTypeface(fontBold);
 
                 JobsContainer.Job jobA = savedJobs.get(i);
                 lblJobTitle.setText(jobA.getTitle());
@@ -659,15 +693,15 @@ public class JobsActivity extends Activity {
             for (int i = 0; i < appliedJobs.size(); i++) {
                 if (Commons.SHOW_DEBUG_MSGS)
                     Log.d(TAG, "Rendered applied job");
-                View rowView = LayoutInflater.from(context).inflate(R.layout.layout_job_turquoise, null);
+                View rowView = LayoutInflater.from(context).inflate(R.layout.layout_job_concrete, null);
 
-                lblJobTitle = (TextView) rowView.findViewById(R.id.lblJobTitle2);
-                lblJobLocation = (TextView) rowView.findViewById(R.id.lblJobLocation2);
-                lblPostDate = (TextView) rowView.findViewById(R.id.lblPostDate2);
+                lblJobTitle = (TextView) rowView.findViewById(R.id.lblJobTitle);
+                lblJobLocation = (TextView) rowView.findViewById(R.id.lblJobLocation);
+                lblPostDate = (TextView) rowView.findViewById(R.id.lblPostDate);
 
                 lblJobTitle.setTypeface(fontBold);
-                lblJobLocation.setTypeface(font);
-                lblPostDate.setTypeface(font);
+                lblJobLocation.setTypeface(fontBold);
+                lblPostDate.setTypeface(fontBold);
 
                 JobsContainer.Job jobA = appliedJobs.get(i);
                 lblJobTitle.setText(jobA.getTitle());
@@ -828,6 +862,17 @@ public class JobsActivity extends Activity {
     public void onBackPressed() {
         if (doubleBackToExitPressedOnce) {
             super.onBackPressed();
+            return;
+        }
+
+        // hide filter first
+        if (layoutFilter.isShown()) {
+            layoutFilter.setVisibility(View.GONE);
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                imgTabFilter.setImageDrawable(getResources().getDrawable(R.drawable.ic_tab_filter_white));
+            } else {
+                imgTabFilter.setImageDrawable(getResources().getDrawable(R.drawable.ic_tab_filter_white, null));
+            }
             return;
         }
 

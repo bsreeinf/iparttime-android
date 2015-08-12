@@ -128,7 +128,7 @@ public class Commons {
         ((ProgressBar) dialog.findViewById(R.id.progress))
                 .getIndeterminateDrawable()
                 .setColorFilter(
-                        context.getResources().getColor(R.color.pallet_turquoise_light),
+                        context.getResources().getColor(R.color.spinner_color),
                         PorterDuff.Mode.SRC_IN
                 );
         return dialog;

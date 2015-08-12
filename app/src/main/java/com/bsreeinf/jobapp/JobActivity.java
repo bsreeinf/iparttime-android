@@ -4,15 +4,17 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,6 +38,12 @@ public class JobActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        try {
+            getActionBar().setDisplayHomeAsUpEnabled(true);
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
         setContentView(R.layout.activity_job);
         jobs = JobsActivity.jobs;
         user_id = JobsActivity.user_id;
@@ -52,8 +60,10 @@ public class JobActivity extends Activity {
         final TextView txtJobLocation = (TextView) findViewById(R.id.txtJobLocation);
         final TextView txtSalaryOffered = (TextView) findViewById(R.id.txtSalaryOffered);
         final TextView txtContactName = (TextView) findViewById(R.id.txtContactName);
-        final TextView txtContactPhone = (TextView) findViewById(R.id.txtContactPhone);
-        final TextView txtContactEmail = (TextView) findViewById(R.id.txtContactEmail);
+//        final TextView txtContactPhone = (TextView) findViewById(R.id.txtContactPhone);
+//        final TextView txtContactEmail = (TextView) findViewById(R.id.txtContactEmail);
+        final LinearLayout btnContactPhone = (LinearLayout) findViewById(R.id.btnContactPhone);
+        final LinearLayout btnContactEmail = (LinearLayout) findViewById(R.id.btnContactEmail);
 
         txtCompanyName.setTypeface(fontBold);
         txtJobTitle.setTypeface(font);
@@ -62,30 +72,30 @@ public class JobActivity extends Activity {
         txtJobLocation.setTypeface(font);
         txtSalaryOffered.setTypeface(font);
         txtContactName.setTypeface(fontBold);
-        txtContactPhone.setTypeface(font);
-        txtContactEmail.setTypeface(font);
+//        txtContactPhone.setTypeface(font);
+//        txtContactEmail.setTypeface(font);
 
-        txtContactPhone.setPaintFlags(txtContactPhone.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
-        txtContactEmail.setPaintFlags(txtContactEmail.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+//        txtContactPhone.setPaintFlags(txtContactPhone.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+//        txtContactEmail.setPaintFlags(txtContactEmail.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
 
         Button btnSave = (Button) findViewById(R.id.btnSave);
         Button btnApply = (Button) findViewById(R.id.btnApply);
 
         txtCompanyName.setText(Commons.companyList.getCompanyByID(jobs.getJob(position).getCompany_id()).getName().toUpperCase());
         txtJobTitle.setText(jobs.getJob(position).getTitle());
-        txtPostedOn.setText(jobs.getJob(position).getPosted_date());
+        txtPostedOn.setText("Posted on " + jobs.getJob(position).getPosted_date());
         txtJobDescription.setText(jobs.getJob(position).getJob_description());
         txtJobLocation.setText(Commons.locationList.getBlockByID(jobs.getJob(position).getLocation_city()).getTitle());
         txtSalaryOffered.setText("\u20B9 " + jobs.getJob(position).getSalary_offered());
         txtContactName.setText(jobs.getJob(position).getContact_person_name());
-        txtContactPhone.setText(jobs.getJob(position).getContact_person_phone());
-        txtContactEmail.setText(jobs.getJob(position).getContact_person_email());
+//        txtContactPhone.setText(jobs.getJob(position).getContact_person_phone());
+//        txtContactEmail.setText(jobs.getJob(position).getContact_person_email());
 
-        txtContactPhone.setOnClickListener(new View.OnClickListener() {
+        btnContactPhone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 try {
-                    Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + txtContactPhone.getText().toString().trim()));
+                    Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + jobs.getJob(position).getContact_person_phone()));
                     startActivity(intent);
                 } catch (Exception e) {
                     Toast.makeText(context, "Unable to dial txtContactPhone.getText().toString().trim()", Toast.LENGTH_SHORT).show();
@@ -93,23 +103,23 @@ public class JobActivity extends Activity {
             }
         });
 
-        txtContactEmail.setOnClickListener(new View.OnClickListener() {
+        btnContactEmail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
-                        "mailto", txtContactEmail.getText().toString(), null));
+                        "mailto", jobs.getJob(position).getContact_person_email(), null));
 //                emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Subject");
 //                emailIntent.putExtra(Intent.EXTRA_TEXT, "Body");
                 startActivity(Intent.createChooser(emailIntent, "Send email"));
             }
         });
 
-        findViewById(R.id.btnDismiss).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+//        findViewById(R.id.btnDismiss).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                finish();
+//            }
+//        });
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -187,16 +197,12 @@ public class JobActivity extends Activity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (item.getItemId()) {
+            // Respond to the action bar's Up/Home button
+            case android.R.id.home:
+                NavUtils.navigateUpFromSameTask(this);
+                return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 }
