@@ -153,37 +153,45 @@ public class JobActivity extends Activity {
                         });
             }
         });
+//        btnApply.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                final ProgressDialog progress = Commons.getCustomProgressDialog(context);
+//                JsonObject requestJson = new JsonObject();
+//                requestJson.addProperty("user_id", user_id);
+//                requestJson.addProperty("job_id", jobs.getJob(position).getJob_id());
+//                requestJson.addProperty("status", SavedAppliedJobsContainer.JOB_STATUS_APPLIED);
+//                Log.d("Ion Request", "Request Json is : " + requestJson.toString());
+//                Ion.with(getApplicationContext())
+//                        .load(Commons.HTTP_POST, Commons.URL_SAVED_APPLIED_JOBS)
+//                        .setLogging("Ion Request", Log.DEBUG)
+//                        .followRedirect(true)
+//                        .setJsonObjectBody(requestJson)
+//                        .asJsonObject()
+//                        .setCallback(new FutureCallback<JsonObject>() {
+//                            @Override
+//                            public void onCompleted(Exception e, JsonObject result) {
+//                                Log.d("Ion Request", "Completed");
+//                                progress.dismiss();
+//                                if (e != null) {
+//                                    e.printStackTrace();
+//                                    return;
+//                                }
+//                                if (Commons.SHOW_DEBUG_MSGS)
+//                                    Log.d(TAG, "Ion Request " + result.toString());
+//                                if (Commons.SHOW_TOAST_MSGS)
+//                                    Toast.makeText(context, "Ion Request " + result.toString(), Toast.LENGTH_LONG).show();
+//                                Toast.makeText(context, "Applied for job", Toast.LENGTH_LONG).show();
+//                            }
+//                        });
+//            }
+//        });
         btnApply.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final ProgressDialog progress = Commons.getCustomProgressDialog(context);
-                JsonObject requestJson = new JsonObject();
-                requestJson.addProperty("user_id", user_id);
-                requestJson.addProperty("job_id", jobs.getJob(position).getJob_id());
-                requestJson.addProperty("status", SavedAppliedJobsContainer.JOB_STATUS_APPLIED);
-                Log.d("Ion Request", "Request Json is : " + requestJson.toString());
-                Ion.with(getApplicationContext())
-                        .load(Commons.HTTP_POST, Commons.URL_SAVED_APPLIED_JOBS)
-                        .setLogging("Ion Request", Log.DEBUG)
-                        .followRedirect(true)
-                        .setJsonObjectBody(requestJson)
-                        .asJsonObject()
-                        .setCallback(new FutureCallback<JsonObject>() {
-                            @Override
-                            public void onCompleted(Exception e, JsonObject result) {
-                                Log.d("Ion Request", "Completed");
-                                progress.dismiss();
-                                if (e != null) {
-                                    e.printStackTrace();
-                                    return;
-                                }
-                                if (Commons.SHOW_DEBUG_MSGS)
-                                    Log.d(TAG, "Ion Request " + result.toString());
-                                if (Commons.SHOW_TOAST_MSGS)
-                                    Toast.makeText(context, "Ion Request " + result.toString(), Toast.LENGTH_LONG).show();
-                                Toast.makeText(context, "Applied for job", Toast.LENGTH_LONG).show();
-                            }
-                        });
+                Intent intent = new Intent(context, QuestionnaireActivity.class);
+                intent.putExtra("position", position);
+                startActivity(intent);
             }
         });
     }

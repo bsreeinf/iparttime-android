@@ -32,10 +32,11 @@ public class Commons {
     public static final boolean SHOW_DEBUG_MSGS = true;
     public static final boolean SHOW_TOAST_MSGS = false;
     protected static final String TAG = "Commons";
+    public static final String IS_FIRST_APP_USE = "isFirstAppUse";
 
     public static String server_ip;
     public static String serverAddress;
-    public static String URL_INIT, URL_USERS, URL_USER, URL_LOGIN, URL_JOBS, URL_JOB, URL_SAVED_APPLIED_JOBS;
+    public static String URL_INIT, URL_USERS, URL_USER, URL_LOGIN, URL_JOBS, URL_JOB, URL_SAVED_APPLIED_JOBS, URL_QUESTIONNAIRE;
 
     public static String HTTP_GET = "GET";
     public static String HTTP_POST = "POST";
@@ -68,8 +69,8 @@ public class Commons {
 //        if (!ip.trim().isEmpty()) {
 //            server_ip = ip;
 //        }
-//        serverAddress = "http://192.168.1.6:3000";
-        serverAddress = "https://safe-ocean-9547.herokuapp.com";
+        serverAddress = "http://192.168.1.8:3000";
+//        serverAddress = "https://safe-ocean-9547.herokuapp.com";
         URL_INIT = serverAddress + "/init";
         URL_USERS = serverAddress + "/users";
         URL_USER = serverAddress + "/user";
@@ -77,6 +78,7 @@ public class Commons {
         URL_JOB = serverAddress + "/job";
         URL_JOBS = serverAddress + "/jobs";
         URL_SAVED_APPLIED_JOBS = serverAddress + "/saved_applied_jobs";
+        URL_QUESTIONNAIRE = serverAddress + "/questionnaires";
     }
 
     public static SharedPreferences getSharedPreferences(Context context) {

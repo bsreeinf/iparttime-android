@@ -2,11 +2,8 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item>
-        <shape android:shape="oval">
-            <stroke
-                android:width="4dp"
-                android:color="@color/pallet_coral_red_dark" />
-            <solid android:color="@android:color/transparent" />
+        <shape android:shape="oval" android:innerRadius="4dp">
+            <solid android:color="@color/pallet_coral_red_light" />
         </shape>
     </item>
 

@@ -13,4 +13,5 @@
     <dimen name="pagination_padding">5dp</dimen>
     <dimen name="margin_bottom_signup_elements">15dp</dimen>
     <dimen name="tab_icon_size">22dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
 </resources>

@@ -12,4 +12,5 @@
     <string name="title_activity_filter">Filters</string>
     <string name="title_activity_job">Job</string>
     <string name="action_empty">Clear list</string>
+    <string name="title_activity_questionnaire">QuestionnaireActivity</string>
 </resources>

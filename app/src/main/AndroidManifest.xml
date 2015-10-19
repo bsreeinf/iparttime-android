@@ -27,7 +27,7 @@
         </activity>
         <activity
             android:name=".RegisterUser"
-            android:label= "@string/title_activity_register_user" >
+            android:label="@string/title_activity_register_user" >
         </activity>
         <activity
             android:name=".JobsActivity"
@@ -40,6 +40,15 @@
         <activity
             android:name=".JobActivity"
             android:label="@string/title_activity_job" >
+        </activity>
+        <activity
+            android:name=".QuestionnaireActivity"
+            android:label="@string/title_activity_questionnaire"
+            android:parentActivityName=".JobActivity"
+            android:theme="@style/AppTheme.NoActionBar" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.bsreeinf.jobapp.JobActivity" />
         </activity>
     </application>
 

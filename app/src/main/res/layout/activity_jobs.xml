@@ -543,7 +543,7 @@
                     android:inputType="textCapWords"
                     android:maxLines="1"
                     android:padding="10dp"
-                    android:textColor="@color/material_red"
+                    android:textColor="@color/app_dark_gray"
                     android:textSize="16sp" />
 
                 <EditText
@@ -558,7 +558,7 @@
                     android:inputType="textEmailAddress"
                     android:maxLines="1"
                     android:padding="10dp"
-                    android:textColor="@color/material_red"
+                    android:textColor="@color/app_dark_gray"
                     android:textSize="16sp" />
 
                 <EditText
@@ -573,7 +573,7 @@
                     android:inputType="phone"
                     android:maxLines="1"
                     android:padding="10dp"
-                    android:textColor="@color/material_red"
+                    android:textColor="@color/app_dark_gray"
                     android:textSize="16sp" />
 
                 <LinearLayout
@@ -698,8 +698,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
-                    android:layout_marginBottom="@dimen/margin_bottom_signup_elements"
-                    android:background="@color/pallet_turquoise_light"
+                    android:layout_marginLeft="30dp"
+                    android:layout_marginRight="30dp"
+                    android:background="@drawable/button_curved"
+                    android:paddingBottom="5dp"
+                    android:paddingLeft="25dp"
+                    android:paddingRight="25dp"
+                    android:paddingTop="5dp"
                     android:text="UPDATE"
                     android:textColor="@android:color/white"
                     android:textSize="20sp"
@@ -746,7 +751,7 @@
                 android:padding="3dp"
                 android:paddingTop="10dp"
                 android:text="Home"
-                android:textColor="@color/pallet_coral_red_dark"
+                android:textColor="@color/pallet_coral_red_light"
                 android:textSize="14sp" />
         </LinearLayout>
 

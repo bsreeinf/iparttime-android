@@ -39,8 +39,9 @@ public class SplashActivity extends Activity {
     private EditText txtEmail;
     private EditText txtPassword;
     private String strEmail, strPassword;
+    private boolean respondToSwipe = true;
 
-    private TextView txtAppDesc, txtSkipTutorial;
+    private TextView txtSkipTutorial;
     private Button btnLogin, btnSignUp;
 
     private Typeface font, fontBold;
@@ -51,15 +52,15 @@ public class SplashActivity extends Activity {
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_splash);
         context = this;
-        font = Typeface.createFromAsset(context.getAssets(), "fonts/Raleway-Light.ttf");
-        fontBold = Typeface.createFromAsset(context.getAssets(), "fonts/Raleway-Bold.ttf");
+        font = Typeface.createFromAsset(context.getAssets(), "fonts/Ubuntu-L.ttf");
+        fontBold = Typeface.createFromAsset(context.getAssets(), "fonts/Ubuntu-B.ttf");
 
-        txtAppDesc = (TextView) findViewById(R.id.txtAppDesc);
+//        txtAppDesc = (TextView) findViewById(R.id.txtAppDesc);
         txtSkipTutorial = (TextView) findViewById(R.id.lblSkipTutorial);
         btnLogin = (Button) findViewById(R.id.btnLogin);
         btnSignUp = (Button) findViewById(R.id.btnSignUp);
 
-        txtAppDesc.setTypeface(font);
+//        txtAppDesc.setTypeface(font);
         txtSkipTutorial.setTypeface(font);
         btnLogin.setTypeface(fontBold);
         btnSignUp.setTypeface(fontBold);
@@ -124,9 +125,18 @@ public class SplashActivity extends Activity {
         txtPassword.setTypeface(font);
 
         viewCount = viewFlipper.getChildCount();
-        addPagination();
-        setSelectedPage(0);
-
+        if (!Commons.getSharedPreferences(context).getBoolean(Commons.IS_FIRST_APP_USE, false)) {
+            addPagination();
+            setSelectedPage(0);
+            SharedPreferences.Editor prefEditor = Commons.getEditor(context);
+            prefEditor.putBoolean(Commons.IS_FIRST_APP_USE, true);
+            prefEditor.commit();
+        } else {
+            for (int i = 0; i < viewCount - 1; i++)
+                viewFlipper.showNext();
+            setSelectedPage(viewCount - 1);
+            respondToSwipe = false;
+        }
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -155,9 +165,8 @@ public class SplashActivity extends Activity {
         txtSkipTutorial.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                viewFlipper.showNext();
-                viewFlipper.showNext();
-                viewFlipper.showNext();
+                for (int i = 0; i < viewCount - 1; i++)
+                    viewFlipper.showNext();
                 setSelectedPage(viewCount - 1);
             }
         });
@@ -165,7 +174,7 @@ public class SplashActivity extends Activity {
         if (prefs.getBoolean("is_logged_in", false)) {
             execLogin(prefs.getString("email", ""), prefs.getString("password", ""));
         } else {
-            txtSkipTutorial.setVisibility(View.VISIBLE);
+//            txtSkipTutorial.setVisibility(View.VISIBLE);
         }
     }
 
@@ -271,6 +280,7 @@ public class SplashActivity extends Activity {
             JsonObject userDetails = responseObject.get("user_details").getAsJsonObject();
             editor.putString("user_id", userDetails.get("id").getAsString());
             editor.putString("name", userDetails.get("name").getAsString());
+            editor.putString("email", userDetails.get("email").getAsString());
             editor.putString("phone", userDetails.get("phone").getAsString());
             editor.putString("highest_education", userDetails.get("highest_education").getAsString());
             editor.putString("skills", userDetails.get("skills").getAsString());
@@ -346,7 +356,7 @@ public class SplashActivity extends Activity {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (!showCoachMarks)
+        if (!showCoachMarks || !respondToSwipe)
             return false;
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:

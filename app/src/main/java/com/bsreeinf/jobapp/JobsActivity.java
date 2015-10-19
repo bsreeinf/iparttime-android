@@ -625,6 +625,8 @@ public class JobsActivity extends Activity {
     }
 
     private void callbackGetSavedAppliedJobsRequest(JsonArray responseObject) {
+        if(responseObject == null)
+            return;
         System.out.println(responseObject.toString());
         final List<JobsContainer.Job> savedJobs = new ArrayList<>();
         final List<JobsContainer.Job> appliedJobs = new ArrayList<>();
