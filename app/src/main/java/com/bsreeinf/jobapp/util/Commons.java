@@ -69,8 +69,8 @@ public class Commons {
 //        if (!ip.trim().isEmpty()) {
 //            server_ip = ip;
 //        }
-        serverAddress = "http://192.168.1.8:3000";
-//        serverAddress = "https://safe-ocean-9547.herokuapp.com";
+//        serverAddress = "http://192.168.1.80:3000";
+        serverAddress = "https://safe-ocean-9547.herokuapp.com";
         URL_INIT = serverAddress + "/init";
         URL_USERS = serverAddress + "/users";
         URL_USER = serverAddress + "/user";

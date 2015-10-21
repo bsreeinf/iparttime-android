@@ -206,7 +206,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="@dimen/margin_bottom_signup_elements"
-                            android:background="@color/pallet_coral_red_alpha"
+                            android:background="@color/white"
                             android:gravity="center_vertical"
                             android:orientation="horizontal"
                             android:padding="5dp">
@@ -221,7 +221,7 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:text="By location"
-                                    android:textColor="@color/white"
+                                    android:textColor="@color/primary_dark_material_dark"
                                     android:textSize="18sp" />
 
                                 <TextView
@@ -229,7 +229,7 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:text="None Selected"
-                                    android:textColor="@color/white" />
+                                    android:textColor="@color/primary_dark_material_dark" />
 
                             </LinearLayout>
 
@@ -245,7 +245,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="@dimen/margin_bottom_signup_elements"
-                            android:background="@color/pallet_coral_red_alpha"
+                            android:background="@color/white"
                             android:gravity="center_vertical"
                             android:orientation="horizontal"
                             android:padding="5dp">
@@ -260,7 +260,7 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:text="By company"
-                                    android:textColor="@color/white"
+                                    android:textColor="@color/primary_dark_material_dark"
                                     android:textSize="18sp" />
 
                                 <TextView
@@ -268,7 +268,7 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:text="None Selected"
-                                    android:textColor="@color/white" />
+                                    android:textColor="@color/primary_dark_material_dark" />
 
                             </LinearLayout>
 
@@ -284,7 +284,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="@dimen/margin_bottom_signup_elements"
-                            android:background="@color/pallet_coral_red_alpha"
+                            android:background="@color/white"
                             android:gravity="center_vertical"
                             android:orientation="horizontal"
                             android:padding="5dp">
@@ -299,7 +299,7 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:text="By industry"
-                                    android:textColor="@color/white"
+                                    android:textColor="@color/primary_dark_material_dark"
                                     android:textSize="18sp" />
 
                                 <TextView
@@ -307,7 +307,7 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:text="None Selected"
-                                    android:textColor="@color/white" />
+                                    android:textColor="@color/primary_dark_material_dark" />
 
                             </LinearLayout>
 
@@ -323,7 +323,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="@dimen/margin_bottom_signup_elements"
-                            android:background="@color/pallet_coral_red_alpha"
+                            android:background="@color/white"
                             android:gravity="center_vertical"
                             android:orientation="horizontal"
                             android:padding="5dp">
@@ -338,7 +338,7 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:text="By salary"
-                                    android:textColor="@color/white"
+                                    android:textColor="@color/primary_dark_material_dark"
                                     android:textSize="18sp" />
 
                                 <TextView
@@ -346,7 +346,7 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:text="None Selected"
-                                    android:textColor="@color/white" />
+                                    android:textColor="@color/primary_dark_material_dark" />
 
                             </LinearLayout>
 

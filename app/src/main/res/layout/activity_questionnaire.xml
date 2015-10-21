@@ -39,29 +39,33 @@
         android:layout_height="0dp"
         android:layout_weight="1">
 
-        <LinearLayout
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/lblSummary"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:layout_marginLeft="10dp"
-                android:text="SUMMARY"
-                android:textColor="@color/pallet_coral_red_dark"
-                android:textSize="17sp"
-                android:visibility="invisible" />
+            android:layout_height="match_parent">
 
             <LinearLayout
-                android:id="@+id/layoutSummary"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical" />
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-        </LinearLayout>
+                <TextView
+                    android:id="@+id/lblSummary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginLeft="10dp"
+                    android:text="SUMMARY"
+                    android:textColor="@color/pallet_coral_red_dark"
+                    android:textSize="17sp"
+                    android:visibility="invisible" />
+
+                <LinearLayout
+                    android:id="@+id/layoutSummary"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical" />
+            </LinearLayout>
+        </ScrollView>
     </ViewFlipper>
 
 
@@ -76,10 +80,39 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/btnApply"
+                android:id="@+id/btnPrevQuestion"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.5"
+                android:background="@android:color/transparent"
+                android:padding="10dp"
+                android:text="Previous"
+                android:textColor="@color/pallet_coral_red_dark"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btnNextQuestion"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:background="@android:color/transparent"
+                android:padding="10dp"
+                android:text="Next"
+                android:textColor="@color/pallet_coral_red_dark"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnApply"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:background="@color/pallet_coral_red_dark"
                 android:padding="10dp"
                 android:text="Apply"

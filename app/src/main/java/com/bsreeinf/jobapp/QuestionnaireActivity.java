@@ -10,13 +10,10 @@ import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
@@ -25,31 +22,41 @@ import com.bsreeinf.jobapp.util.Commons;
 import com.bsreeinf.jobapp.util.JobsContainer;
 import com.bsreeinf.jobapp.util.Questionnaire;
 import com.bsreeinf.jobapp.util.SavedAppliedJobsContainer;
+import com.daimajia.swipe.SwipeLayout;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 public class QuestionnaireActivity extends Activity {
 
     private static final String TAG = "JobActivity";
+    private final boolean isLeftRight = true;
+    private final boolean autoMoveToNextQuestion = true;
     private JobsContainer jobs;
     private String user_id;
     private Context context;
     private int position = 0;
     private Typeface font, fontBold;
     private Map<Integer, Integer> answers;
+    private Map<Integer, List<SwipeLayout>> refOptions;
     private int questionCount;
-
-    private float lastX;
+    private float lastTouch;
     private ViewFlipper viewFlipper;
     private LinearLayout layoutSummary;
     private int viewCount;
     private TextView layoutPagination;
+    private int entry_a;
+    private int exit_a;
+    private int entry_b;
+    private int exit_b;
+
 
     public QuestionnaireActivity() {
     }
@@ -64,6 +71,19 @@ public class QuestionnaireActivity extends Activity {
             e.printStackTrace();
         }
         setContentView(R.layout.activity_questionnaire);
+
+        if (isLeftRight) {
+            entry_a = R.anim.slide_left_in;
+            exit_a = R.anim.slide_left_out;
+            entry_b = R.anim.slide_right_in;
+            exit_b = R.anim.slide_right_out;
+        } else {
+            entry_a = R.anim.slide_up_in;
+            exit_a = R.anim.slide_up_out;
+            entry_b = R.anim.slide_down_in;
+            exit_b = R.anim.slide_down_out;
+        }
+
         jobs = JobsActivity.jobs;
         user_id = JobsActivity.user_id;
         context = this;
@@ -71,6 +91,7 @@ public class QuestionnaireActivity extends Activity {
         font = Typeface.createFromAsset(context.getAssets(), "fonts/Raleway-Light.ttf");
         fontBold = Typeface.createFromAsset(context.getAssets(), "fonts/Raleway-Bold.ttf");
         answers = new HashMap<>();
+        refOptions = new HashMap<>();
         requestQuestionnaire();
 
         viewFlipper = (ViewFlipper) findViewById(R.id.layoutQuestionnaire);
@@ -121,37 +142,87 @@ public class QuestionnaireActivity extends Activity {
             lblQuestion.setText(question.getQuestion());
             lblQuestion.setTypeface(font);
 
-            final RadioGroup layoutOptions = (RadioGroup) layoutQuestion.findViewById(R.id.layoutOptions);
+            final LinearLayout layoutOptions = (LinearLayout) layoutQuestion.findViewById(R.id.layoutOptions);
+            refOptions.put(i, new ArrayList<SwipeLayout>());
             for (int j = 0; j < question.getOptionCount(); j++) {
                 Questionnaire.Option option = question.getOption(j);
 
-                RadioButton layoutOption = (RadioButton) LayoutInflater
+                // Inflate a layout for option and set data
+                SwipeLayout layoutOption = (SwipeLayout) LayoutInflater
                         .from(context)
                         .inflate(R.layout.layout_questionnaire_options_row, null);
-                layoutOption.setText(option.getOption());
-                layoutOption.setTypeface(font);
+                final TextView txtBottomOption = (TextView) layoutOption.findViewById(R.id.txtBottomOption);
+                final TextView txtSurfaceOption = (TextView) layoutOption.findViewById(R.id.txtSurfaceOption);
+//                LinearLayout layoutBottomOption = (LinearLayout) layoutOptions.findViewById(R.id.layoutBottomOption);
+
+                txtSurfaceOption.setText(option.getOption());
+                txtSurfaceOption.setTypeface(font);
+                txtBottomOption.setText(option.getOption());
+                txtBottomOption.setTypeface(font);
+
+                layoutOption.setShowMode(SwipeLayout.ShowMode.LayDown);
+                //add drag edge.(If the BottomView has 'layout_gravity' attribute, this line is unnecessary)
+                layoutOption.addDrag(SwipeLayout.DragEdge.Left, txtBottomOption);
+                refOptions.get(i).add(layoutOption);
+                layoutOption.setRightSwipeEnabled(false);
+                final int finalJ = j;
+                layoutOption.addSwipeListener(new SwipeLayout.SwipeListener() {
+                    @Override
+                    public void onStartOpen(SwipeLayout layout) {
+                        List<SwipeLayout> tempRefList = refOptions.get(finalI);
+                        for (int k = 0; k < tempRefList.size(); k++) {
+                            if (tempRefList.get(k).getOpenStatus() == SwipeLayout.Status.Open
+                                    && k != finalJ)
+                                tempRefList.get(k).close();
+
+                        }
+                    }
+
+                    @Override
+                    public void onOpen(SwipeLayout layout) {
+                        // close other open options
+
+//                        txtBottomOption.setVisibility(View.VISIBLE);
+
+                        Log.d(TAG, "clicked " + finalI + " : " + finalJ);
+                        answers.put(finalI, question.getOption(finalJ).getId());
+                        ((TextView) layoutSummary.getChildAt(finalI).findViewById(R.id.lblQuestion))
+                                .setText((finalI + 1) + ". " + question.getOption(finalJ).getOption());
+
+                        // Auto-move to next question
+                        if (autoMoveToNextQuestion) {
+                            viewFlipper.setInAnimation(context, entry_a);
+                            viewFlipper.setOutAnimation(context, exit_a);
+                            viewFlipper.showNext();
+                        }
+                        setSelectedPage(viewFlipper.getDisplayedChild());
+                    }
+
+                    @Override
+                    public void onStartClose(SwipeLayout layout) {
+
+                    }
+
+                    @Override
+                    public void onClose(SwipeLayout layout) {
+                        answers.remove(finalI);
+                    }
+
+                    @Override
+                    public void onUpdate(SwipeLayout layout, int leftOffset, int topOffset) {
+
+                    }
+
+                    @Override
+                    public void onHandRelease(SwipeLayout layout, float xvel, float yvel) {
+
+                    }
+                });
+
+                // Add option to the view
                 layoutOptions.addView(layoutOption);
             }
-            layoutOptions.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(RadioGroup group, int checkedId) {
-                    View radioButton = layoutOptions.findViewById(checkedId);
-                    int pos = layoutOptions.indexOfChild(radioButton);
-                    Log.d(TAG, "clicked " + finalI + " : " + pos);
-//                    if (answers.containsKey(finalI))
-                    answers.put(finalI, question.getOption(pos).getId());
-                    ((TextView) layoutSummary.getChildAt(finalI).findViewById(R.id.lblQuestion))
-                            .setText((finalI + 1) + ". " + question.getOption(pos).getOption());
-
-                    // Auto-move to next question
-                    viewFlipper.setInAnimation(context, R.anim.slide_left_in);
-                    viewFlipper.setOutAnimation(context, R.anim.slide_left_out);
-                    viewFlipper.showNext();
-                    setSelectedPage(viewFlipper.getDisplayedChild());
-                }
-            });
             viewFlipper.addView(layoutQuestion, viewFlipper.getChildCount() - 1);
-
 
         }
         // Add summary page here
@@ -161,6 +232,21 @@ public class QuestionnaireActivity extends Activity {
         viewCount = viewFlipper.getChildCount();
         setSelectedPage(0);
         findViewById(R.id.lblSummary).setVisibility(View.VISIBLE);
+
+        Button btnPrevQuestion = (Button) findViewById(R.id.btnPrevQuestion);
+        Button btnNextQuestion = (Button) findViewById(R.id.btnNextQuestion);
+        btnPrevQuestion.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                viewPrevQuestion();
+            }
+        });
+        btnNextQuestion.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                viewNextQuestion();
+            }
+        });
     }
 
     private void requestQuestionnaire() {
@@ -293,41 +379,62 @@ public class QuestionnaireActivity extends Activity {
 
     }
 
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                lastX = event.getX();
-                break;
-            case MotionEvent.ACTION_UP:
-                float currentX = event.getX();
-                // Handling left to right screen swap.
-                if (lastX < currentX) {
-                    // If there aren't any other children, just break.
-                    if (viewFlipper.getDisplayedChild() == 0)
-                        break;
-                    viewFlipper.setInAnimation(context, R.anim.slide_right_in);
-                    viewFlipper.setOutAnimation(context, R.anim.slide_right_out);
-                    viewFlipper.showPrevious();
-                    setSelectedPage(viewFlipper.getDisplayedChild());
-                }
-                if (lastX > currentX) {
-                    if (viewFlipper.getDisplayedChild() == viewCount - 1)
-                        break;
-                    viewFlipper.setInAnimation(context, R.anim.slide_left_in);
-                    viewFlipper.setOutAnimation(context, R.anim.slide_left_out);
-                    viewFlipper.showNext();
-                    setSelectedPage(viewFlipper.getDisplayedChild());
-                }
-                break;
-        }
-        return false;
+//    @Override
+//    public boolean onTouchEvent(MotionEvent event) {
+//        switch (event.getAction()) {
+//            case MotionEvent.ACTION_DOWN:
+//                lastTouch = event.getY();
+//                break;
+//            case MotionEvent.ACTION_UP:
+//                float currentTouch = event.getY();
+//                // Handling left to right screen swap.
+//                if (lastTouch < currentTouch) {
+//                    // If there aren't any other children, just break.
+//                    if (viewFlipper.getDisplayedChild() == 0)
+//                        break;
+//                    viewFlipper.setInAnimation(context, entry_b);
+//                    viewFlipper.setOutAnimation(context, exit_b);
+//                    viewFlipper.showPrevious();
+//                    setSelectedPage(viewFlipper.getDisplayedChild());
+//                }
+//                if (lastTouch > currentTouch) {
+//                    if (viewFlipper.getDisplayedChild() == viewCount - 1)
+//                        break;
+//                    viewFlipper.setInAnimation(context, entry_a);
+//                    viewFlipper.setOutAnimation(context, exit_a);
+//                    viewFlipper.showNext();
+//                    setSelectedPage(viewFlipper.getDisplayedChild());
+//                }
+//                break;
+//        }
+//        return false;
+//    }
+
+    private void viewPrevQuestion() {
+        if (viewFlipper.getDisplayedChild() == 0)
+            return;
+        viewFlipper.setInAnimation(context, entry_b);
+        viewFlipper.setOutAnimation(context, exit_b);
+        viewFlipper.showPrevious();
+        setSelectedPage(viewFlipper.getDisplayedChild());
+    }
+
+    private void viewNextQuestion() {
+        if (viewFlipper.getDisplayedChild() == viewCount - 1)
+            return;
+        viewFlipper.setInAnimation(context, entry_a);
+        viewFlipper.setOutAnimation(context, exit_a);
+        viewFlipper.showNext();
+        setSelectedPage(viewFlipper.getDisplayedChild());
     }
 
     private void setSelectedPage(int index) {
-        if (index == viewCount - 1)
+        if (index == viewCount - 1) {
             layoutPagination.setText("");
-        else
+//            layoutPagination.setVisibility(View.GONE);
+        } else {
+//            layoutPagination.setVisibility(View.VISIBLE);
             layoutPagination.setText("Question " + (index + 1) + " of " + (viewCount - 1));
+        }
     }
 }
