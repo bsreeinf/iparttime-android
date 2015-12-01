@@ -35,7 +35,7 @@ public class Commons {
 
     public static String server_ip;
     public static String serverAddress;
-    public static String URL_INIT, URL_USERS, URL_USER, URL_LOGIN, URL_JOBS, URL_JOB, URL_SAVED_APPLIED_JOBS, URL_QUESTIONNAIRE;
+    public static String URL_INIT, URL_USERS, URL_USER, URL_LOGIN, URL_JOBS, URL_JOB, URL_SAVED_APPLIED_JOBS, URL_SAVE_APPLY_JOB, URL_QUESTIONNAIRE;
 
     public static String HTTP_GET = "GET";
     public static String HTTP_POST = "POST";
@@ -72,12 +72,12 @@ public class Commons {
 //        serverAddress = "https://nexjobs.herokuapp.com";
         URL_INIT = serverAddress + "/init.json";
         URL_USERS = serverAddress + "/users.json";
-        URL_USER = serverAddress + "/user";
+        URL_USER = serverAddress + "/users";
         URL_LOGIN = serverAddress + "/login_device.json";
         URL_JOB = serverAddress + "/job";
         URL_JOBS = serverAddress + "/jobs.json";
-        URL_SAVED_APPLIED_JOBS = serverAddress + "/saved_applied_jobs";
-        URL_QUESTIONNAIRE = serverAddress + "/questionnaires";
+        URL_SAVED_APPLIED_JOBS = serverAddress + "/saved_applied_jobs.json";
+        URL_SAVE_APPLY_JOB = serverAddress + "/save_apply_job.json";
     }
 
     public static SharedPreferences getSharedPreferences(Context context) {

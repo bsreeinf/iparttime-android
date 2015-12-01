@@ -3,11 +3,13 @@ package com.bsreeinf.jobapp;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -43,7 +45,7 @@ public class JobActivity extends Activity {
             e.printStackTrace();
         }
         setContentView(R.layout.activity_job);
-        job = JobsActivity.jobs.getJobByID(getIntent().getIntExtra("jobID", 0));
+        job = MainActivity.jobs.getJobByID(getIntent().getIntExtra("jobID", 0));
         context = this;
         font = Typeface.createFromAsset(context.getAssets(), "fonts/Raleway-Light.ttf");
         fontBold = Typeface.createFromAsset(context.getAssets(), "fonts/Raleway-Bold.ttf");
@@ -123,13 +125,15 @@ public class JobActivity extends Activity {
                 JsonObject requestJson = new JsonObject();
                 requestJson.addProperty("user_id", Commons.currentUser.getId());
                 requestJson.addProperty("job_id", job.get_id());
-                requestJson.addProperty("status", SavedAppliedJobsContainer.JOB_STATUS_SAVED);
+                requestJson.addProperty("job_status_id", SavedAppliedJobsContainer.JOB_STATUS_SAVED);
+                JsonObject finalRequest = new JsonObject();
+                finalRequest.add("saved_applied_job", requestJson);
                 Log.d("Ion Request", "Request Json is : " + requestJson.toString());
                 Ion.with(getApplicationContext())
-                        .load(Commons.HTTP_POST, Commons.URL_SAVED_APPLIED_JOBS)
+                        .load(Commons.HTTP_POST, Commons.URL_SAVE_APPLY_JOB)
                         .setLogging("Ion Request", Log.DEBUG)
                         .followRedirect(true)
-                        .setJsonObjectBody(requestJson)
+                        .setJsonObjectBody(finalRequest)
                         .asJsonObject()
                         .setCallback(new FutureCallback<JsonObject>() {
                             @Override
@@ -153,9 +157,60 @@ public class JobActivity extends Activity {
         btnApply.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(context, QuestionnaireActivity.class);
-                intent.putExtra("jobID", job.get_id());
-                startActivity(intent);
+                if (job.getQuestionnaire().getQuestionCount() == 0) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+//                    final TextView txtURL = new TextView(context);
+//                    builder.setView(txtURL);
+                    builder.setMessage("Are you sure you want to apply for this job?");
+
+                    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                    builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            final ProgressDialog progress = Commons.getCustomProgressDialog(context);
+                            JsonObject requestJson = new JsonObject();
+                            requestJson.addProperty("user_id", Commons.currentUser.getId());
+                            requestJson.addProperty("job_id", job.get_id());
+                            requestJson.addProperty("job_status_id", SavedAppliedJobsContainer.JOB_STATUS_APPLIED);
+                            JsonObject finalRequest = new JsonObject();
+                            finalRequest.add("saved_applied_job", requestJson);
+
+                            Log.d("Ion Request", "Request Json is : " + requestJson.toString());
+                            Ion.with(getApplicationContext())
+                                    .load(Commons.HTTP_POST, Commons.URL_SAVE_APPLY_JOB)
+                                    .setLogging("Ion Request", Log.DEBUG)
+                                    .followRedirect(true)
+                                    .setJsonObjectBody(finalRequest)
+                                    .asJsonObject()
+                                    .setCallback(new FutureCallback<JsonObject>() {
+                                        @Override
+                                        public void onCompleted(Exception e, JsonObject result) {
+                                            Log.d("Ion Request", "Completed");
+                                            progress.dismiss();
+                                            if (e != null) {
+                                                e.printStackTrace();
+                                                return;
+                                            }
+                                            if (Commons.SHOW_DEBUG_MSGS)
+                                                Log.d(TAG, "Ion Request " + result.toString());
+                                            if (Commons.SHOW_TOAST_MSGS)
+                                                Toast.makeText(context, "Ion Request " + result.toString(), Toast.LENGTH_LONG).show();
+                                            Toast.makeText(context, "Applied for job - " + job.getTitle(), Toast.LENGTH_LONG).show();
+                                        }
+                                    });
+                        }
+                    });
+                    builder.create().show();
+                } else {
+                    Intent intent = new Intent(context, QuestionnaireActivity.class);
+                    intent.putExtra("jobID", job.get_id());
+                    startActivity(intent);
+                }
             }
         });
     }

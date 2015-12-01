@@ -48,10 +48,28 @@ public class SimpleContainer {
         return tag;
     }
 
+    public String getTitles(List<Integer> ids) {
+        String result = "";
+        if (ids == null)
+            result = getTitles();
+        else if (ids.size() == 0)
+            result = "None Selected";
+        else {
+            for (int i = 0; i < ids.size(); i++) {
+                result += getBlockByID(ids.get(i)).description + (i == ids.size() - 1 ? "" : ", ");
+            }
+        }
+        return result;
+    }
+
     public String getTitles() {
         String result = "";
-        for (int i = 0; i < elements.size() - 1; i++) {
-            result += elements.get(i).description + (i == elements.size() - 1 ? "" : ", ");
+        if (elements.size() == 0)
+            result = "None Selected";
+        else {
+            for (int i = 0; i < elements.size(); i++) {
+                result += elements.get(i).description + (i == elements.size() - 1 ? "" : ", ");
+            }
         }
         return result;
     }

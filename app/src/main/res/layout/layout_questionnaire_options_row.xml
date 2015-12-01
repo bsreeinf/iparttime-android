@@ -1,38 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?><!--<RadioButton xmlns:android="http://schemas.android.com/apk/res/android"--><!--android:layout_width="wrap_content"--><!--android:layout_height="wrap_content"--><!--android:layout_marginTop="4dp"--><!--android:text="Option" />-->
-<com.daimajia.swipe.SwipeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="80dp"
     android:paddingBottom="1dp"
     android:background="@drawable/border_bottom">
-    <!-- Bottom View Start-->
-    <TextView
-        android:id="@+id/txtBottomOption"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/pallet_coral_red_light"
-        android:padding="20dp"
-        android:textColor="@color/white"
-        android:textStyle="bold"
-        android:textSize="18sp" />
-    <!-- Bottom View End-->
 
-    <!-- Surface View Start -->
     <LinearLayout
+        android:id="@+id/lytBack"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center_vertical"
         android:background="@color/white">
 
         <TextView
-            android:id="@+id/txtSurfaceOption"
+            android:id="@+id/txtOption"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:elevation="5dp"
             android:padding="20dp"
-            android:text="asdAs"
             android:textColor="@color/app_dark_gray"
             android:textSize="18sp" />
         <!--What you want to show in SurfaceView-->
     </LinearLayout>
-    <!-- Surface View End -->
-</com.daimajia.swipe.SwipeLayout>
+</LinearLayout>

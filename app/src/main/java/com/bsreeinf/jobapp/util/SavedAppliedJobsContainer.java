@@ -1,5 +1,7 @@
 package com.bsreeinf.jobapp.util;
 
+import android.util.Log;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -31,10 +33,13 @@ public class SavedAppliedJobsContainer {
             listSavedAppliedJobs.add(new SavedAppliedStub(arrSavedAppliedJobs.get(i).getAsJsonObject()));
             map.put(listSavedAppliedJobs.get(i).getId(), listSavedAppliedJobs.get(i));
 
-            if (listSavedAppliedJobs.get(i).getStatus() == SavedAppliedJobsContainer.JOB_STATUS_SAVED)
+            if (listSavedAppliedJobs.get(i).getStatus() == SavedAppliedJobsContainer.JOB_STATUS_SAVED) {
                 savedJobIDs.add(listSavedAppliedJobs.get(i).getId());
-            else if (listSavedAppliedJobs.get(i).getStatus() == SavedAppliedJobsContainer.JOB_STATUS_APPLIED)
-                appliedJobIDs.add(listSavedAppliedJobs.get(i).getId());
+                Log.d("SAJ","Added Saved : " + listSavedAppliedJobs.get(i).getJob_id());
+            } else if (listSavedAppliedJobs.get(i).getStatus() == SavedAppliedJobsContainer.JOB_STATUS_APPLIED) {
+                appliedJobIDs.add(listSavedAppliedJobs.get(i).getJob_id());
+                Log.d("SAJ", "Added Applied : " + listSavedAppliedJobs.get(i).getId());
+            }
         }
     }
 

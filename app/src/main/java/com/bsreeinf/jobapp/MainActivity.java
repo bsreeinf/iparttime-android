@@ -45,9 +45,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class JobsActivity extends Activity {
+public class MainActivity extends Activity {
 
-    private static final String TAG = "JobsActivity";
+    private static final String TAG = "MainActivity";
     public static JobsContainer jobs;
     private TextView txtTabHome, txtTabSaved, txtTabProfile;
     private ImageView imgTabHome, imgTabFilter, imgTabSaved, imgTabProfile;
@@ -56,12 +56,12 @@ public class JobsActivity extends Activity {
     private ListView layoutJobsContainer;
     private LinearLayout layoutSavedJobsContainer, layoutAppliedJobsContainer;
     private AnimatedLinearLayout layoutFilter;
-    private ArrayList<Integer> arrFilterLocationIDs, arrFilterCompanyIDs, arrFilterIndustryIDs, arrFilterSalaryIDs;
+    private List<Integer> arrFilterLocationIDs, arrFilterCompanyIDs, arrFilterIndustryIDs, arrFilterSalaryIDs;
     private TextView txtFilterLocation, txtFilterCompany, txtFilterIndustry, txtFilterSalary;
-    private ArrayList<Integer> arrSkillsIDs, arrLanguagesIDs;
+    private List<Integer> arrSkillsIDs, arrLanguagesIDs;
     private Integer idHighestEducation;
     private EditText txtName;
-    private EditText txtEmail;
+    private TextView txtEmail;
     private EditText txtPhone;
     private EditText txtPassword;
     private EditText txtConfirmPassword;
@@ -382,7 +382,7 @@ public class JobsActivity extends Activity {
         });
 
         txtName = (EditText) findViewById(R.id.txtName);
-        txtEmail = (EditText) findViewById(R.id.txtEmail);
+        txtEmail = (TextView) findViewById(R.id.txtEmailShow);
         txtPhone = (EditText) findViewById(R.id.txtPhone);
 
         txtHighestEducation = (TextView) findViewById(R.id.txtHighestEducation);
@@ -400,19 +400,25 @@ public class JobsActivity extends Activity {
         LinearLayout layoutSkills = (LinearLayout) findViewById(R.id.layoutSkills);
         LinearLayout layoutLanguages = (LinearLayout) findViewById(R.id.layoutLanguages);
 
+        idHighestEducation = Commons.currentUser.getQualification_id();
         layoutHighestEducation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                List<Integer> arrHighestEducation = idHighestEducation == null || idHighestEducation < 1 ?
+                        new ArrayList<Integer>() :
+                        new ArrayList<Integer>();
+                if (!(idHighestEducation == null || idHighestEducation < 1))
+                    arrHighestEducation.add(idHighestEducation);
                 new DialogMultiselect(
                         context,
                         SimpleContainer.CONTAINER_TYPE_EDUCATION2,
                         Commons.educationList.getElementList(),
-                        idHighestEducation == null ? new ArrayList<Integer>() : new ArrayList<Integer>(idHighestEducation)
-                )
-                        .show(getFragmentManager(), "");
+                        arrHighestEducation
+                ).show(getFragmentManager(), "");
             }
         });
 
+        arrSkillsIDs = Commons.currentUser.getSkills();
         layoutSkills.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -425,6 +431,7 @@ public class JobsActivity extends Activity {
             }
         });
 
+        arrLanguagesIDs = Commons.currentUser.getLanguages();
         layoutLanguages.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -446,14 +453,13 @@ public class JobsActivity extends Activity {
                 JsonObject requestJson = new JsonObject();
                 requestJson.addProperty("id", Commons.currentUser.getId());
                 requestJson.addProperty("name", txtName.getText().toString().trim());
-                requestJson.addProperty("email", txtEmail.getText().toString().trim());
                 requestJson.addProperty("phone", txtPhone.getText().toString().trim());
-                requestJson.addProperty("highest_education", idHighestEducation);
-//                requestJson.addProperty("skills", strSkillsIDs);
-//                requestJson.addProperty("language", strLanguagesIDs);
+                requestJson.addProperty("qualification_id", idHighestEducation);
+                requestJson.addProperty("skills", arrSkillsIDs.toString());
+                requestJson.addProperty("languages", arrLanguagesIDs.toString());
                 Log.d("Ion Request", "Request Json is : " + requestJson.toString());
                 Ion.with(getApplicationContext())
-                        .load(Commons.HTTP_PUT, Commons.URL_USERS + "/" + Commons.currentUser.getId() + ".json")
+                        .load(Commons.HTTP_PUT, Commons.URL_USER + "/" + Commons.currentUser.getId() + ".json")
                         .setLogging("Ion Request", Log.DEBUG)
                         .followRedirect(true)
                         .setJsonObjectBody(requestJson)
@@ -470,7 +476,7 @@ public class JobsActivity extends Activity {
                                 if (Commons.SHOW_DEBUG_MSGS)
                                     Log.d(TAG, "Ion Request " + result.toString());
                                 if (Commons.SHOW_TOAST_MSGS)
-                                    Toast.makeText(context, "Ion Request " + result.toString(), Toast.LENGTH_LONG).show();
+                                    Toast.makeText(context, "Profile updated successfully", Toast.LENGTH_LONG).show();
 
                                 callbackProfileUpdateRequest(result);
                             }
@@ -486,6 +492,7 @@ public class JobsActivity extends Activity {
                 Log.d(TAG, "Update succeeded");
             if (Commons.SHOW_TOAST_MSGS)
                 Toast.makeText(context, "Update succeeded", Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "Update succeeded", Toast.LENGTH_LONG).show();
         } else {
             if (Commons.SHOW_DEBUG_MSGS)
                 Log.d(TAG, "Update failed");
@@ -534,29 +541,13 @@ public class JobsActivity extends Activity {
         txtName.setText(Commons.currentUser.getName());
         txtEmail.setText(Commons.currentUser.getEmail());
         txtPhone.setText(Commons.currentUser.getPhone());
-        txtHighestEducation.setText(
-                Commons.educationList.getBlockByID(
-                        Commons.currentUser.getQualification_id()
-                ).getTitle()
-        );
+        Log.d("dd", idHighestEducation.toString());
+        txtHighestEducation.setText(idHighestEducation == null || idHighestEducation < 1 ?
+                "None Selected" :
+                Commons.educationList.getBlockByID(idHighestEducation).getTitle());
+        txtSkills.setText(Commons.skillsList.getTitles(arrSkillsIDs));
+        txtLanguages.setText(Commons.languageList.getTitles(arrLanguagesIDs));
 
-        txtHighestEducation.setText("");
-        if (idHighestEducation == null)
-            txtHighestEducation.setText("None Selected");
-        else
-            txtHighestEducation.setText(Commons.educationList.getBlockByID(idHighestEducation).getTitle());
-
-        txtSkills.setText("");
-        if (arrSkillsIDs.size() == 0)
-            txtSkills.setText("None Selected");
-        else
-            txtSkills.setText(Commons.skillsList.getTitles());
-
-        txtLanguages.setText("");
-        if (arrLanguagesIDs.size() == 0)
-            txtLanguages.setText("None Selected");
-        else
-            txtSkills.setText(Commons.languageList.getTitles());
     }
 
     private void callbackGetJobsRequest(JsonArray responseObject) {
@@ -701,7 +692,7 @@ public class JobsActivity extends Activity {
         }
     }
 
-    public void onMultiselectCompleted(int tag, ArrayList<Integer> ids) {
+    public void onMultiselectCompleted(int tag, List<Integer> ids) {
         String strIDs = "";
         for (int i = 0; i < ids.size(); i++) {
             strIDs += ids.get(i) + ((i != ids.size() - 1) ? "," : "");
@@ -735,7 +726,7 @@ public class JobsActivity extends Activity {
         refreshStoresText(tag, ids);
     }
 
-    private void refreshStoresText(int tag, ArrayList<Integer> ids) {
+    private void refreshStoresText(int tag, List<Integer> ids) {
         TextView textViewToUpdate;
         SimpleContainer listElements = null;
         CompanyContainer companyList = null;

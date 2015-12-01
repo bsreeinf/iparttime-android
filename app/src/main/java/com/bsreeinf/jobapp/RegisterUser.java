@@ -25,12 +25,13 @@ import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class RegisterUser extends Activity {
     private static final String TAG = "RegisterUser";
     private String strHighestEducatioIDs, strSkillsIDs, strLanguagesIDs;
-    private ArrayList<Integer>  arrSkillsIDs, arrLanguagesIDs;
+    private List<Integer>  arrSkillsIDs, arrLanguagesIDs;
     private Integer idHighestEducation;
     private ViewFlipper viewFlipper;
     private Context context;
@@ -298,7 +299,7 @@ public class RegisterUser extends Activity {
         editor.putString("email", txtEmail.getText().toString().toLowerCase().trim());
         editor.putString("password", txtPassword.getText().toString().trim());
         editor.putBoolean("is_logged_in", true);
-        startActivity(new Intent(context, JobsActivity.class));
+        startActivity(new Intent(context, MainActivity.class));
         finish();
     }
 
@@ -378,7 +379,7 @@ public class RegisterUser extends Activity {
     }
 
 
-    public void onMultiselectCompleted(int tag, ArrayList<Integer> ids) {
+    public void onMultiselectCompleted(int tag, List<Integer> ids) {
         String strIDs = "";
         for (int i = 0; i < ids.size(); i++) {
             strIDs += ids.get(i) + ((i != ids.size() - 1) ? "," : "");
@@ -402,7 +403,7 @@ public class RegisterUser extends Activity {
         refreshStoresText(tag, ids);
     }
 
-    private void refreshStoresText(int tag, ArrayList<Integer> ids) {
+    private void refreshStoresText(int tag, List<Integer> ids) {
         TextView textViewToUpdate;
         SimpleContainer listElements;
         switch (tag) {

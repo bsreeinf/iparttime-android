@@ -114,7 +114,8 @@ public class SplashActivity extends Activity {
         } else {
             for (int i = 0; i < viewCount - 1; i++)
                 viewFlipper.showNext();
-            setSelectedPage(viewCount - 1);
+//            setSelectedPage(viewCount - 1);
+            layoutPagination.setVisibility(View.GONE);
             respondToSwipe = false;
         }
         btnLogin.setOnClickListener(new View.OnClickListener() {
@@ -186,7 +187,7 @@ public class SplashActivity extends Activity {
         editor.putString("password", strPassword);
         editor.putBoolean("is_logged_in", true);
         editor.commit();
-        startActivity(new Intent(context, JobsActivity.class));
+        startActivity(new Intent(context, MainActivity.class));
         finish();
     }
 

@@ -527,9 +527,19 @@
                 android:layout_width="280dp"
                 android:layout_height="match_parent"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="15dp"
+                android:layout_marginTop="10dp"
                 android:gravity="center_horizontal"
                 android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/txtEmailShow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:gravity="center"
+                    android:padding="5dp"
+                    android:textColor="@color/app_dark_gray"
+                    android:textSize="16sp"/>
 
                 <EditText
                     android:id="@+id/txtName"
@@ -542,22 +552,7 @@
                     android:imeOptions="actionNext"
                     android:inputType="textCapWords"
                     android:maxLines="1"
-                    android:padding="10dp"
-                    android:textColor="@color/app_dark_gray"
-                    android:textSize="16sp" />
-
-                <EditText
-                    android:id="@+id/txtEmail"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
-                    android:background="@color/white"
-                    android:gravity="center"
-                    android:hint="Email"
-                    android:imeOptions="actionNext"
-                    android:inputType="textEmailAddress"
-                    android:maxLines="1"
-                    android:padding="10dp"
+                    android:padding="7dp"
                     android:textColor="@color/app_dark_gray"
                     android:textSize="16sp" />
 
@@ -572,7 +567,7 @@
                     android:imeOptions="actionGo"
                     android:inputType="phone"
                     android:maxLines="1"
-                    android:padding="10dp"
+                    android:padding="7dp"
                     android:textColor="@color/app_dark_gray"
                     android:textSize="16sp" />
 

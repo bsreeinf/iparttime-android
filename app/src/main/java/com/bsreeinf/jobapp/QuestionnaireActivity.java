@@ -4,9 +4,11 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,16 +24,13 @@ import com.bsreeinf.jobapp.util.Commons;
 import com.bsreeinf.jobapp.util.JobsContainer;
 import com.bsreeinf.jobapp.util.Questionnaire;
 import com.bsreeinf.jobapp.util.SavedAppliedJobsContainer;
-import com.daimajia.swipe.SwipeLayout;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 public class QuestionnaireActivity extends Activity {
@@ -43,7 +42,7 @@ public class QuestionnaireActivity extends Activity {
     private Context context;
     private Typeface font, fontBold;
     private Map<Integer, Integer> answers;
-    private Map<Integer, List<SwipeLayout>> refOptions;
+    private Map<Integer, LinearLayout> refOptions;
     private int questionCount;
     private float lastTouch;
     private ViewFlipper viewFlipper;
@@ -83,7 +82,7 @@ public class QuestionnaireActivity extends Activity {
         }
 
         context = this;
-        job = JobsActivity.jobs.getJobByID(getIntent().getIntExtra("jobID", 0));
+        job = MainActivity.jobs.getJobByID(getIntent().getIntExtra("jobID", 0));
         font = Typeface.createFromAsset(context.getAssets(), "fonts/Raleway-Light.ttf");
         fontBold = Typeface.createFromAsset(context.getAssets(), "fonts/Raleway-Bold.ttf");
         answers = new HashMap<>();
@@ -142,82 +141,57 @@ public class QuestionnaireActivity extends Activity {
             lblQuestion.setTypeface(font);
 
             final LinearLayout layoutOptions = (LinearLayout) layoutQuestion.findViewById(R.id.layoutOptions);
-            refOptions.put(i, new ArrayList<SwipeLayout>());
             for (int j = 0; j < question.getOptionCount(); j++) {
                 Questionnaire.Option option = question.getOption(j);
 
+
                 // Inflate a layout for option and set data
-                SwipeLayout layoutOption = (SwipeLayout) LayoutInflater
+                final LinearLayout layoutOption = (LinearLayout) LayoutInflater
                         .from(context)
                         .inflate(R.layout.layout_questionnaire_options_row, null);
-                final TextView txtBottomOption = (TextView) layoutOption.findViewById(R.id.txtBottomOption);
-                final TextView txtSurfaceOption = (TextView) layoutOption.findViewById(R.id.txtSurfaceOption);
-//                LinearLayout layoutBottomOption = (LinearLayout) layoutOptions.findViewById(R.id.layoutBottomOption);
+                final TextView txtOption = (TextView) layoutOption.findViewById(R.id.txtOption);
 
-                txtSurfaceOption.setText(option.getOption());
-                txtSurfaceOption.setTypeface(font);
-                txtBottomOption.setText(option.getOption());
-                txtBottomOption.setTypeface(font);
-
-                layoutOption.setShowMode(SwipeLayout.ShowMode.LayDown);
-                //add drag edge.(If the BottomView has 'layout_gravity' attribute, this line is unnecessary)
-                layoutOption.addDrag(SwipeLayout.DragEdge.Left, txtBottomOption);
-                refOptions.get(i).add(layoutOption);
-                layoutOption.setRightSwipeEnabled(false);
+                txtOption.setText(option.getOption());
+                txtOption.setTypeface(font);
+                refOptions.put(i, layoutOption);
                 final int finalJ = j;
-                layoutOption.addSwipeListener(new SwipeLayout.SwipeListener() {
+                layoutOption.setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public void onStartOpen(SwipeLayout layout) {
-                        List<SwipeLayout> tempRefList = refOptions.get(finalI);
-                        for (int k = 0; k < tempRefList.size(); k++) {
-                            if (tempRefList.get(k).getOpenStatus() == SwipeLayout.Status.Open
-                                    && k != finalJ)
-                                tempRefList.get(k).close();
+                    public void onClick(View view) {
+                        if (refOptions.get(finalI) == layoutOption) {
+                            layoutOption.findViewById(R.id.lytBack).setBackgroundColor(Color.WHITE);
+                            ((TextView) layoutOption.findViewById(R.id.txtOption)).setTextColor(ContextCompat.getColor(context,
+                                    R.color.app_dark_gray));
 
+                            refOptions.remove(finalI);
+                            answers.remove(finalI);
+                            ((TextView) layoutSummary.getChildAt(finalI).findViewById(R.id.lblQuestion))
+                                    .setText("Not Selected");
+                        } else {
+                            refOptions.get(finalI).findViewById(R.id.lytBack).setBackgroundColor(Color.WHITE);
+                            ((TextView)refOptions.get(finalI).findViewById(R.id.txtOption)).setTextColor(ContextCompat.getColor(context,
+                                    R.color.app_dark_gray));
+
+                            refOptions.put(finalI, layoutOption);
+
+                            refOptions.get(finalI).findViewById(R.id.lytBack).setBackgroundColor(ContextCompat.getColor(context,
+                                    R.color.pallet_coral_red_light));
+                            ((TextView)refOptions.get(finalI).findViewById(R.id.txtOption)).setTextColor(Color.WHITE);
+
+                            answers.put(finalI, question.getOption(finalJ).getId());
+                            ((TextView) layoutSummary.getChildAt(finalI).findViewById(R.id.lblQuestion))
+                                    .setText((finalI + 1) + ". " + question.getOption(finalJ).getOption());
+
+                            // Auto-move to next question
+                            if (autoMoveToNextQuestion) {
+                                viewFlipper.setInAnimation(context, entry_a);
+                                viewFlipper.setOutAnimation(context, exit_a);
+                                viewFlipper.showNext();
+                            }
+                            setSelectedPage(viewFlipper.getDisplayedChild());
                         }
-                    }
-
-                    @Override
-                    public void onOpen(SwipeLayout layout) {
-                        // close other open options
-
-//                        txtBottomOption.setVisibility(View.VISIBLE);
-
-                        Log.d(TAG, "clicked " + finalI + " : " + finalJ);
-                        answers.put(finalI, question.getOption(finalJ).getId());
-                        ((TextView) layoutSummary.getChildAt(finalI).findViewById(R.id.lblQuestion))
-                                .setText((finalI + 1) + ". " + question.getOption(finalJ).getOption());
-
-                        // Auto-move to next question
-                        if (autoMoveToNextQuestion) {
-                            viewFlipper.setInAnimation(context, entry_a);
-                            viewFlipper.setOutAnimation(context, exit_a);
-                            viewFlipper.showNext();
-                        }
-                        setSelectedPage(viewFlipper.getDisplayedChild());
-                    }
-
-                    @Override
-                    public void onStartClose(SwipeLayout layout) {
-
-                    }
-
-                    @Override
-                    public void onClose(SwipeLayout layout) {
-                        answers.remove(finalI);
-                    }
-
-                    @Override
-                    public void onUpdate(SwipeLayout layout, int leftOffset, int topOffset) {
-
-                    }
-
-                    @Override
-                    public void onHandRelease(SwipeLayout layout, float xvel, float yvel) {
-
                     }
                 });
-
                 // Add option to the view
                 layoutOptions.addView(layoutOption);
             }
@@ -302,7 +276,7 @@ public class QuestionnaireActivity extends Activity {
         } else {
             String strAnswer = null;
             for (Iterator i = answers.keySet().iterator(); i.hasNext(); ) {
-                strAnswer = (strAnswer == null ? "" : strAnswer + ",") + "" + answers.get(i.next());
+                strAnswer = (strAnswer == null ? "" : strAnswer + "||||") + "" + answers.get(i.next());
             }
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             final TextView txtURL = new TextView(context);
@@ -324,13 +298,16 @@ public class QuestionnaireActivity extends Activity {
                     requestJson.addProperty("user_id", Commons.currentUser.getId());
                     requestJson.addProperty("job_id", job.get_id());
                     requestJson.addProperty("questionnaire_answers", finalStrAnswer);
-                    requestJson.addProperty("status", SavedAppliedJobsContainer.JOB_STATUS_APPLIED);
+                    requestJson.addProperty("job_status_id", SavedAppliedJobsContainer.JOB_STATUS_APPLIED);
+                    JsonObject finalRequest = new JsonObject();
+                    finalRequest.add("saved_applied_job", requestJson);
+
                     Log.d("Ion Request", "Request Json is : " + requestJson.toString());
                     Ion.with(getApplicationContext())
-                            .load(Commons.HTTP_POST, Commons.URL_SAVED_APPLIED_JOBS)
+                            .load(Commons.HTTP_POST, Commons.URL_SAVE_APPLY_JOB)
                             .setLogging("Ion Request", Log.DEBUG)
                             .followRedirect(true)
-                            .setJsonObjectBody(requestJson)
+                            .setJsonObjectBody(finalRequest)
                             .asJsonObject()
                             .setCallback(new FutureCallback<JsonObject>() {
                                 @Override

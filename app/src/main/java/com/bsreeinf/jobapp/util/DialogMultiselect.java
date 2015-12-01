@@ -12,7 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.Toast;
 
-import com.bsreeinf.jobapp.JobsActivity;
+import com.bsreeinf.jobapp.MainActivity;
 import com.bsreeinf.jobapp.R;
 import com.bsreeinf.jobapp.RegisterUser;
 
@@ -27,10 +27,10 @@ public class DialogMultiselect extends DialogFragment {
     private LinearLayout listItems;
     private AlertDialog.Builder builder1;
     private AlertDialog dialog;
-    private ArrayList<Integer> ids;
+    private List<Integer> ids;
 
     public DialogMultiselect(final Context c, final int tag, final List<SimpleContainer.SimpleBlock> listElemnts,
-                             final ArrayList<Integer> ids) {
+                             final List<Integer> ids) {
         this.context = c;
         this.ids = ids;
         this.listElemnts = listElemnts;
@@ -123,7 +123,7 @@ public class DialogMultiselect extends DialogFragment {
                             case SimpleContainer.CONTAINER_TYPE_EDUCATION2:
                             case SimpleContainer.CONTAINER_TYPE_SKILLS2:
                             case SimpleContainer.CONTAINER_TYPE_LANGUAGES2:
-                                ((JobsActivity) context).onMultiselectCompleted(tag, ids);
+                                ((MainActivity) context).onMultiselectCompleted(tag, ids);
                                 break;
                         }
 
