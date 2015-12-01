@@ -151,9 +151,10 @@ public class QuestionnaireActivity extends Activity {
                         .inflate(R.layout.layout_questionnaire_options_row, null);
                 final TextView txtOption = (TextView) layoutOption.findViewById(R.id.txtOption);
 
-                txtOption.setText(option.getOption());
+                txtOption.setText(option.getOption() + "");
                 txtOption.setTypeface(font);
                 refOptions.put(i, layoutOption);
+
                 final int finalJ = j;
                 layoutOption.setOnClickListener(new View.OnClickListener() {
                     @Override
