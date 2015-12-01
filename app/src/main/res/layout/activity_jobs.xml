@@ -149,7 +149,7 @@
                     android:layout_height="100dp"
                     android:alpha="0.5"
                     android:contentDescription="null view image"
-                    android:src="@drawable/common_signin_btn_icon_pressed_light" />
+                    android:src="@drawable/common_google_signin_btn_icon_light" />
 
                 <TextView
                     android:layout_width="wrap_content"

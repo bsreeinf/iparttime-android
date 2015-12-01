@@ -30,7 +30,8 @@ import java.util.ArrayList;
 public class RegisterUser extends Activity {
     private static final String TAG = "RegisterUser";
     private String strHighestEducatioIDs, strSkillsIDs, strLanguagesIDs;
-    private ArrayList<String> arrHighestEducatioIDs, arrSkillsIDs, arrLanguagesIDs;
+    private ArrayList<Integer>  arrSkillsIDs, arrLanguagesIDs;
+    private Integer idHighestEducation;
     private ViewFlipper viewFlipper;
     private Context context;
     private int viewCount;
@@ -94,43 +95,36 @@ public class RegisterUser extends Activity {
             public void onClick(View v) {
                 if (!isRegistrationPasswordValid())
                     return;
-                if (Commons.IS_NETWORK_TEST_EMULATED) {
-                    callbackRegistrationRequest(TestNetwork.request(
-                                    TestNetwork.getSampleRegistrationRequest(TestNetwork.TYPE_DEFAULT))
-                    );
-                } else {
-                    //TODO Actual network request here; Callbacks: callbackInitRequest()
-                    final ProgressDialog progress = Commons.getCustomProgressDialog(context);
-                    JsonObject requestJson = new JsonObject();
-                    requestJson.addProperty("name", txtName.getText().toString().trim());
-                    requestJson.addProperty("email", txtEmail.getText().toString().trim());
-                    requestJson.addProperty("phone", txtPhone.getText().toString().trim());
-                    requestJson.addProperty("password", txtPassword.getText().toString().trim());
-                    Log.d("Ion Request", "Request Json is : " + requestJson.toString());
-                    Ion.with(getApplicationContext())
-                            .load(Commons.HTTP_POST, Commons.URL_USERS)
-                            .setLogging("Ion Request", Log.DEBUG)
-                            .followRedirect(true)
-                            .setJsonObjectBody(requestJson)
-                            .asJsonObject()
-                            .setCallback(new FutureCallback<JsonObject>() {
-                                @Override
-                                public void onCompleted(Exception e, JsonObject result) {
-                                    Log.d("Ion Request", "Completed");
-                                    progress.dismiss();
-                                    if (e != null) {
-                                        e.printStackTrace();
-                                        return;
-                                    }
-                                    if (Commons.SHOW_DEBUG_MSGS)
-                                        Log.d(TAG, "Ion Request " + result.toString());
-                                    if (Commons.SHOW_TOAST_MSGS)
-                                        Toast.makeText(context, "Ion Request " + result.toString(), Toast.LENGTH_LONG).show();
-
-                                    callbackRegistrationRequest(result);
+                final ProgressDialog progress = Commons.getCustomProgressDialog(context);
+                JsonObject requestJson = new JsonObject();
+                requestJson.addProperty("name", txtName.getText().toString().trim());
+                requestJson.addProperty("email", txtEmail.getText().toString().trim());
+                requestJson.addProperty("phone", txtPhone.getText().toString().trim());
+                requestJson.addProperty("password", txtPassword.getText().toString().trim());
+                Log.d("Ion Request", "Request Json is : " + requestJson.toString());
+                Ion.with(getApplicationContext())
+                        .load(Commons.HTTP_POST, Commons.URL_USERS)
+                        .setLogging("Ion Request", Log.DEBUG)
+                        .followRedirect(true)
+                        .setJsonObjectBody(requestJson)
+                        .asJsonObject()
+                        .setCallback(new FutureCallback<JsonObject>() {
+                            @Override
+                            public void onCompleted(Exception e, JsonObject result) {
+                                Log.d("Ion Request", "Completed");
+                                progress.dismiss();
+                                if (e != null) {
+                                    e.printStackTrace();
+                                    return;
                                 }
-                            });
-                }
+                                if (Commons.SHOW_DEBUG_MSGS)
+                                    Log.d(TAG, "Ion Request " + result.toString());
+                                if (Commons.SHOW_TOAST_MSGS)
+                                    Toast.makeText(context, "Ion Request " + result.toString(), Toast.LENGTH_LONG).show();
+
+                                callbackRegistrationRequest(result);
+                            }
+                        });
             }
 
         });
@@ -139,66 +133,41 @@ public class RegisterUser extends Activity {
             public void onClick(View v) {
                 if (!isListsDataValid())
                     return;
-                if (Commons.IS_NETWORK_TEST_EMULATED) {
-//                    callbackUserDataUpdateRequest(TestNetwork.request(
-//                                    TestNetwork.getSampleUserDataUpdateRequest(TestNetwork.TYPE_DEFAULT))
-//                    );
-                } else {
-                    //TODO Actual network request here; Callbacks: callbackInitRequest()
-                    final ProgressDialog progress = Commons.getCustomProgressDialog(context);
-                    JsonObject requestJson = new JsonObject();
-                    requestJson.addProperty("highest_education", strHighestEducatioIDs);
-                    requestJson.addProperty("skills", strSkillsIDs);
-                    requestJson.addProperty("language", strLanguagesIDs);
+                final ProgressDialog progress = Commons.getCustomProgressDialog(context);
+                JsonObject requestJson = new JsonObject();
+                requestJson.addProperty("highest_education", strHighestEducatioIDs);
+                requestJson.addProperty("skills", strSkillsIDs);
+                requestJson.addProperty("language", strLanguagesIDs);
 
-                    Log.d("Ion Request", "Request Json is : " + requestJson.toString());
-                    Ion.with(getApplicationContext())
-                            .load(Commons.HTTP_PUT, Commons.URL_USERS + "/" + user_id)
-                            .setLogging("Ion Request", Log.DEBUG)
-                            .followRedirect(true)
-                            .setJsonObjectBody(requestJson)
-                            .asString()
-                            .setCallback(new FutureCallback<String>() {
-                                @Override
-                                public void onCompleted(Exception e, String result) {
-                                    Log.d("Ion Request", "Completed");
-                                    progress.dismiss();
-                                    if (e != null) {
-                                        e.printStackTrace();
-                                        return;
-                                    }
-                                    if (Commons.SHOW_DEBUG_MSGS)
-                                        Log.d(TAG, "Ion Request " + result.toString());
-                                    if (Commons.SHOW_TOAST_MSGS)
-                                        Toast.makeText(context, "Ion Request " + result.toString(), Toast.LENGTH_LONG).show();
-
-                                    callbackUserDataUpdateRequest(result);
+                Log.d("Ion Request", "Request Json is : " + requestJson.toString());
+                Ion.with(getApplicationContext())
+                        .load(Commons.HTTP_PUT, Commons.URL_USERS + "/" + user_id)
+                        .setLogging("Ion Request", Log.DEBUG)
+                        .followRedirect(true)
+                        .setJsonObjectBody(requestJson)
+                        .asString()
+                        .setCallback(new FutureCallback<String>() {
+                            @Override
+                            public void onCompleted(Exception e, String result) {
+                                Log.d("Ion Request", "Completed");
+                                progress.dismiss();
+                                if (e != null) {
+                                    e.printStackTrace();
+                                    return;
                                 }
-                            });
-                }
+                                if (Commons.SHOW_DEBUG_MSGS)
+                                    Log.d(TAG, "Ion Request " + result.toString());
+                                if (Commons.SHOW_TOAST_MSGS)
+                                    Toast.makeText(context, "Ion Request " + result.toString(), Toast.LENGTH_LONG).show();
+
+                                callbackUserDataUpdateRequest(result);
+                            }
+                        });
+
             }
 
         });
 
-//        SimpleContainerAdapter highestEducationAdapter = new SimpleContainerAdapter(context, Commons.educationList.getElementList());
-//        highestEducationAdapter.setDropDownViewResource(android.R.layout.select_dialog_multichoice);
-//        highestEducationAdapter.setNotifyOnChange(true);
-//        if (spnHighestEducation != null)
-//            spnHighestEducation.setAdapter(highestEducationAdapter);
-//
-//        SimpleContainerAdapter spnSkillsAdapter = new SimpleContainerAdapter(context, Commons.skillsList.getElementList());
-//        spnSkillsAdapter.setDropDownViewResource(android.R.layout.select_dialog_multichoice);
-//        spnSkillsAdapter.setNotifyOnChange(true);
-//        if (spnSkills != null)
-//            spnSkills.setAdapter(spnSkillsAdapter);
-//
-//        SimpleContainerAdapter spnLanguagesAdapter = new SimpleContainerAdapter(context, Commons.languageList.getElementList());
-//        spnLanguagesAdapter.setDropDownViewResource(android.R.layout.select_dialog_multichoice);
-//        spnLanguagesAdapter.setNotifyOnChange(true);
-//        if (spnLanguages != null)
-//            spnLanguages.setAdapter(spnLanguagesAdapter);
-
-//        layoutHighestEducation, layoutSkills, layoutLanguages
         layoutHighestEducation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -206,7 +175,7 @@ public class RegisterUser extends Activity {
                         context,
                         SimpleContainer.CONTAINER_TYPE_EDUCATION,
                         Commons.educationList.getElementList(),
-                        arrHighestEducatioIDs
+                        new ArrayList<Integer>(idHighestEducation)
                 )
                         .show(getFragmentManager(), "");
             }
@@ -409,14 +378,14 @@ public class RegisterUser extends Activity {
     }
 
 
-    public void onMultiselectCompleted(int tag, ArrayList<String> ids) {
+    public void onMultiselectCompleted(int tag, ArrayList<Integer> ids) {
         String strIDs = "";
         for (int i = 0; i < ids.size(); i++) {
             strIDs += ids.get(i) + ((i != ids.size() - 1) ? "," : "");
         }
         switch (tag) {
             case SimpleContainer.CONTAINER_TYPE_EDUCATION:
-                arrHighestEducatioIDs = ids;
+                idHighestEducation = ids.get(0);
                 strHighestEducatioIDs = strIDs;
                 break;
             case SimpleContainer.CONTAINER_TYPE_SKILLS:
@@ -433,7 +402,7 @@ public class RegisterUser extends Activity {
         refreshStoresText(tag, ids);
     }
 
-    private void refreshStoresText(int tag, ArrayList<String> ids) {
+    private void refreshStoresText(int tag, ArrayList<Integer> ids) {
         TextView textViewToUpdate;
         SimpleContainer listElements;
         switch (tag) {

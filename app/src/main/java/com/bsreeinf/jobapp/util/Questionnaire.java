@@ -42,7 +42,7 @@ public class Questionnaire {
         public Question(JsonObject questionStub) {
             this.id = questionStub.get("id").getAsInt();
             this.question = questionStub.get("question").getAsString();
-            JsonArray optionsArray = questionStub.get("options").getAsJsonArray();
+            JsonArray optionsArray = questionStub.get("questionnaire_options").getAsJsonArray();
             options = new ArrayList<>();
             for (int i = 0; i < optionsArray.size(); i++) {
                 options.add(new Option(optionsArray.get(i).getAsJsonObject()));

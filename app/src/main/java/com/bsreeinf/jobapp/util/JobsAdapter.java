@@ -51,7 +51,7 @@ public class JobsAdapter extends ArrayAdapter<SimpleContainer> {
 
         currBlock = listItems.get(position);
         holder.txtTitle.setText(currBlock.getTitle());
-        holder.txtJobLocation.setText(Commons.locationList.getBlockByID(currBlock.getLocation_city()).getTitle());
+        holder.txtJobLocation.setText(Commons.locationList.getBlockByID(currBlock.getLocation_id()).getTitle());
         holder.txtPostDate.setText(currBlock.getPosted_date());
         holder.txtCompany.setText(Commons.companyList.getCompanyByID(currBlock.getCompany_id()).getName().toUpperCase());
 

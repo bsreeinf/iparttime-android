@@ -29,10 +29,8 @@ import com.koushikdutta.ion.Ion;
 public class JobActivity extends Activity {
 
     private static final String TAG = "JobActivity";
-    private JobsContainer jobs;
-    private String user_id;
+    private JobsContainer.Job job;
     private Context context;
-    private int position = 0;
     private Typeface font, fontBold;
 
     @Override
@@ -45,10 +43,8 @@ public class JobActivity extends Activity {
             e.printStackTrace();
         }
         setContentView(R.layout.activity_job);
-        jobs = JobsActivity.jobs;
-        user_id = JobsActivity.user_id;
+        job = JobsActivity.jobs.getJobByID(getIntent().getIntExtra("jobID", 0));
         context = this;
-        position = getIntent().getIntExtra("position", 0);
         font = Typeface.createFromAsset(context.getAssets(), "fonts/Raleway-Light.ttf");
         fontBold = Typeface.createFromAsset(context.getAssets(), "fonts/Raleway-Bold.ttf");
 
@@ -81,13 +77,13 @@ public class JobActivity extends Activity {
         Button btnSave = (Button) findViewById(R.id.btnSave);
         Button btnApply = (Button) findViewById(R.id.btnApply);
 
-        txtCompanyName.setText(Commons.companyList.getCompanyByID(jobs.getJob(position).getCompany_id()).getName().toUpperCase());
-        txtJobTitle.setText(jobs.getJob(position).getTitle());
-        txtPostedOn.setText("Posted on " + jobs.getJob(position).getPosted_date());
-        txtJobDescription.setText(jobs.getJob(position).getJob_description());
-        txtJobLocation.setText(Commons.locationList.getBlockByID(jobs.getJob(position).getLocation_city()).getTitle());
-        txtSalaryOffered.setText("\u20B9 " + jobs.getJob(position).getSalary_offered());
-        txtContactName.setText(jobs.getJob(position).getContact_person_name());
+        txtCompanyName.setText(Commons.companyList.getCompanyByID(job.getCompany_id()).getName().toUpperCase());
+        txtJobTitle.setText(job.getTitle());
+        txtPostedOn.setText("Posted on " + job.getPosted_date());
+        txtJobDescription.setText(job.getJob_description());
+        txtJobLocation.setText(Commons.locationList.getBlockByID(job.getLocation_id()).getTitle());
+        txtSalaryOffered.setText("\u20B9 " + job.getSalary_offered());
+        txtContactName.setText(job.getContact_person_name());
 //        txtContactPhone.setText(jobs.getJob(position).getContact_person_phone());
 //        txtContactEmail.setText(jobs.getJob(position).getContact_person_email());
 
@@ -95,7 +91,7 @@ public class JobActivity extends Activity {
             @Override
             public void onClick(View v) {
                 try {
-                    Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + jobs.getJob(position).getContact_person_phone()));
+                    Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + job.getContact_person_phone()));
                     startActivity(intent);
                 } catch (Exception e) {
                     Toast.makeText(context, "Unable to dial txtContactPhone.getText().toString().trim()", Toast.LENGTH_SHORT).show();
@@ -107,7 +103,7 @@ public class JobActivity extends Activity {
             @Override
             public void onClick(View v) {
                 Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
-                        "mailto", jobs.getJob(position).getContact_person_email(), null));
+                        "mailto", job.getContact_person_email(), null));
 //                emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Subject");
 //                emailIntent.putExtra(Intent.EXTRA_TEXT, "Body");
                 startActivity(Intent.createChooser(emailIntent, "Send email"));
@@ -125,8 +121,8 @@ public class JobActivity extends Activity {
             public void onClick(View v) {
                 final ProgressDialog progress = Commons.getCustomProgressDialog(context);
                 JsonObject requestJson = new JsonObject();
-                requestJson.addProperty("user_id", user_id);
-                requestJson.addProperty("job_id", jobs.getJob(position).getJob_id());
+                requestJson.addProperty("user_id", Commons.currentUser.getId());
+                requestJson.addProperty("job_id", job.get_id());
                 requestJson.addProperty("status", SavedAppliedJobsContainer.JOB_STATUS_SAVED);
                 Log.d("Ion Request", "Request Json is : " + requestJson.toString());
                 Ion.with(getApplicationContext())
@@ -153,44 +149,12 @@ public class JobActivity extends Activity {
                         });
             }
         });
-//        btnApply.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                final ProgressDialog progress = Commons.getCustomProgressDialog(context);
-//                JsonObject requestJson = new JsonObject();
-//                requestJson.addProperty("user_id", user_id);
-//                requestJson.addProperty("job_id", jobs.getJob(position).getJob_id());
-//                requestJson.addProperty("status", SavedAppliedJobsContainer.JOB_STATUS_APPLIED);
-//                Log.d("Ion Request", "Request Json is : " + requestJson.toString());
-//                Ion.with(getApplicationContext())
-//                        .load(Commons.HTTP_POST, Commons.URL_SAVED_APPLIED_JOBS)
-//                        .setLogging("Ion Request", Log.DEBUG)
-//                        .followRedirect(true)
-//                        .setJsonObjectBody(requestJson)
-//                        .asJsonObject()
-//                        .setCallback(new FutureCallback<JsonObject>() {
-//                            @Override
-//                            public void onCompleted(Exception e, JsonObject result) {
-//                                Log.d("Ion Request", "Completed");
-//                                progress.dismiss();
-//                                if (e != null) {
-//                                    e.printStackTrace();
-//                                    return;
-//                                }
-//                                if (Commons.SHOW_DEBUG_MSGS)
-//                                    Log.d(TAG, "Ion Request " + result.toString());
-//                                if (Commons.SHOW_TOAST_MSGS)
-//                                    Toast.makeText(context, "Ion Request " + result.toString(), Toast.LENGTH_LONG).show();
-//                                Toast.makeText(context, "Applied for job", Toast.LENGTH_LONG).show();
-//                            }
-//                        });
-//            }
-//        });
+
         btnApply.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(context, QuestionnaireActivity.class);
-                intent.putExtra("position", position);
+                intent.putExtra("jobID", job.get_id());
                 startActivity(intent);
             }
         });

@@ -22,6 +22,7 @@ import com.bsreeinf.jobapp.util.Commons;
 import com.bsreeinf.jobapp.util.CompanyContainer;
 import com.bsreeinf.jobapp.util.SimpleContainer;
 import com.bsreeinf.jobapp.util.TestNetwork;
+import com.bsreeinf.jobapp.util.User;
 import com.google.gson.JsonObject;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
@@ -46,75 +47,54 @@ public class SplashActivity extends Activity {
 
     private Typeface font, fontBold;
 
+    private SharedPreferences prefs;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_splash);
         context = this;
+        prefs = Commons.getSharedPreferences(context);
         font = Typeface.createFromAsset(context.getAssets(), "fonts/Ubuntu-L.ttf");
         fontBold = Typeface.createFromAsset(context.getAssets(), "fonts/Ubuntu-B.ttf");
 
-//        txtAppDesc = (TextView) findViewById(R.id.txtAppDesc);
         txtSkipTutorial = (TextView) findViewById(R.id.lblSkipTutorial);
         btnLogin = (Button) findViewById(R.id.btnLogin);
         btnSignUp = (Button) findViewById(R.id.btnSignUp);
 
-//        txtAppDesc.setTypeface(font);
         txtSkipTutorial.setTypeface(font);
         btnLogin.setTypeface(fontBold);
         btnSignUp.setTypeface(fontBold);
-//        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-//        final EditText txtURL = new EditText(context);
-//        builder.setView(txtURL);
-//        txtURL.setText(Commons.getSharedPreferences(context).getString("IP", "192.168.1.80"));
-//
-//        builder.setPositiveButton("Update", new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialog, int which) {
-//                Commons.initURLs(txtURL.getText().toString(), "3000");
-//                Commons.getEditor(context).putString("IP", txtURL.getText().toString()).commit();
         Commons.initURLs(null, null);
-        if (Commons.IS_NETWORK_TEST_EMULATED) {
-            callbackInitRequest(TestNetwork.request(
-                            TestNetwork.getSampleInitRequest(TestNetwork.TYPE_DEFAULT))
-            );
-        } else {
-            //TODO Actual network request here; Callbacks: callbackInitRequest()
 
-            final ProgressDialog progress = Commons.getCustomProgressDialog(context);
-            Log.d("Ion Request", "Request URI is : " + Commons.URL_INIT);
-            Ion.with(getApplicationContext())
-                    .load(Commons.HTTP_GET, Commons.URL_INIT)
-                    .setLogging("Ion Request", Log.DEBUG)
-                    .followRedirect(true)
-                    .asJsonObject()
-                    .setCallback(new FutureCallback<JsonObject>() {
-                        @Override
-                        public void onCompleted(Exception e, JsonObject result) {
-                            Log.d("Ion Request", "Completed");
-                            progress.dismiss();
-                            if (e != null) {
-                                e.printStackTrace();
-                                return;
-                            }
-                            if (Commons.SHOW_DEBUG_MSGS)
-                                Log.d(TAG, "Ion Request " + result.toString());
-                            if (Commons.SHOW_TOAST_MSGS)
-                                Toast.makeText(context, "Ion Request " + result.toString(), Toast.LENGTH_LONG).show();
-
-                            callbackInitRequest(result);
+        final ProgressDialog progress = Commons.getCustomProgressDialog(context);
+        Log.d("Ion Request", "Request URI is : " + Commons.URL_INIT);
+        Ion.with(getApplicationContext())
+                .load(Commons.HTTP_GET, Commons.URL_INIT)
+                .setLogging("Ion Request", Log.DEBUG)
+                .followRedirect(true)
+                .asJsonObject()
+                .setCallback(new FutureCallback<JsonObject>() {
+                    @Override
+                    public void onCompleted(Exception e, JsonObject result) {
+                        Log.d("Ion Request", "Completed");
+                        progress.dismiss();
+                        if (e != null) {
+                            e.printStackTrace();
+                            return;
                         }
-                    });
-        }
-//
-//            }
-//        });
-//        builder.create().show();
+                        if (Commons.SHOW_DEBUG_MSGS)
+                            Log.d(TAG, "Ion Request " + result.toString());
+                        if (Commons.SHOW_TOAST_MSGS)
+                            Toast.makeText(context, "Ion Request " + result.toString(), Toast.LENGTH_LONG).show();
+
+                        callbackInitRequest(result);
+                    }
+                });
     }
 
     private void init() {
-        SharedPreferences prefs = Commons.getSharedPreferences(context);
         showCoachMarks = prefs.getBoolean(IS_FIRST_APP_USE, true);
         layoutPagination = (LinearLayout) findViewById(R.id.layoutPagination);
         viewFlipper = (ViewFlipper) findViewById(R.id.viewFlipper);
@@ -125,7 +105,7 @@ public class SplashActivity extends Activity {
         txtPassword.setTypeface(font);
 
         viewCount = viewFlipper.getChildCount();
-        if (!Commons.getSharedPreferences(context).getBoolean(Commons.IS_FIRST_APP_USE, false)) {
+        if (!showCoachMarks) {
             addPagination();
             setSelectedPage(0);
             SharedPreferences.Editor prefEditor = Commons.getEditor(context);
@@ -142,19 +122,8 @@ public class SplashActivity extends Activity {
             public void onClick(View v) {
                 if (!isLoginDataValid())
                     return;
-                if (Commons.IS_NETWORK_TEST_EMULATED) {
-                    callbackLoginRequest(TestNetwork.request(
-                                    TestNetwork.getSampleLoginRequest(TestNetwork.TYPE_DEFAULT,
-                                            txtEmail.getText().toString(),
-                                            txtPassword.getText().toString()))
-                    );
-                } else {
-                    //TODO Actual network request here; Callbacks: callbackInitRequest()
-                    execLogin(txtEmail.getText().toString().trim(), txtPassword.getText().toString().trim());
-                }
-
+                execLogin(txtEmail.getText().toString().trim(), txtPassword.getText().toString().trim());
             }
-
         });
         btnSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -244,10 +213,6 @@ public class SplashActivity extends Activity {
                     SimpleContainer.CONTAINER_TYPE_LOCATIONS,
                     responseObject.get("location_list").getAsJsonArray()
             );
-            Commons.jobFunctionList = new SimpleContainer(
-                    SimpleContainer.CONTAINER_TYPE_JOB_FUNCTIONS,
-                    responseObject.get("job_function_list").getAsJsonArray()
-            );
             Commons.salaryRangeList = new SimpleContainer(
                     SimpleContainer.CONTAINER_TYPE_SALARY_RANGES,
                     responseObject.get("salary_range_list").getAsJsonArray()
@@ -276,16 +241,11 @@ public class SplashActivity extends Activity {
             if (Commons.SHOW_TOAST_MSGS)
                 Toast.makeText(context, "Login request succeeded", Toast.LENGTH_LONG).show();
 
-            SharedPreferences.Editor editor = Commons.getEditor(context);
-            JsonObject userDetails = responseObject.get("user_details").getAsJsonObject();
-            editor.putString("user_id", userDetails.get("id").getAsString());
-            editor.putString("name", userDetails.get("name").getAsString());
-            editor.putString("email", userDetails.get("email").getAsString());
-            editor.putString("phone", userDetails.get("phone").getAsString());
-            editor.putString("highest_education", userDetails.get("highest_education").getAsString());
-            editor.putString("skills", userDetails.get("skills").getAsString());
-            editor.putString("language", userDetails.get("language").getAsString());
-            editor.commit();
+            Commons.currentUser = new User(responseObject.get("user_details").getAsJsonObject());
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putString("email", strEmail);
+            editor.putString("password", strPassword);
+            editor.apply();
 
             finishLogin();
         } else {

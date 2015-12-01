@@ -27,10 +27,10 @@ public class DialogMultiselect extends DialogFragment {
     private LinearLayout listItems;
     private AlertDialog.Builder builder1;
     private AlertDialog dialog;
-    private ArrayList<String> ids;
+    private ArrayList<Integer> ids;
 
     public DialogMultiselect(final Context c, final int tag, final List<SimpleContainer.SimpleBlock> listElemnts,
-                             final ArrayList<String> ids) {
+                             final ArrayList<Integer> ids) {
         this.context = c;
         this.ids = ids;
         this.listElemnts = listElemnts;

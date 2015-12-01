@@ -6,7 +6,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
@@ -35,7 +34,6 @@ import com.bsreeinf.jobapp.util.CompanyContainer;
 import com.bsreeinf.jobapp.util.DialogMultiselect;
 import com.bsreeinf.jobapp.util.JobsAdapter;
 import com.bsreeinf.jobapp.util.JobsContainer;
-import com.bsreeinf.jobapp.util.SavedAppliedJobsContainer;
 import com.bsreeinf.jobapp.util.SimpleContainer;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -44,7 +42,6 @@ import com.koushikdutta.ion.Ion;
 import com.koushikdutta.ion.builder.Builders;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 
@@ -52,30 +49,23 @@ public class JobsActivity extends Activity {
 
     private static final String TAG = "JobsActivity";
     public static JobsContainer jobs;
-    public static String user_id = null;
     private TextView txtTabHome, txtTabSaved, txtTabProfile;
     private ImageView imgTabHome, imgTabFilter, imgTabSaved, imgTabProfile;
     private ViewFlipper viewFlipper;
     private Context context;
-    private int viewCount;
     private ListView layoutJobsContainer;
     private LinearLayout layoutSavedJobsContainer, layoutAppliedJobsContainer;
     private AnimatedLinearLayout layoutFilter;
-    private String strFilterLocation, strFilterCompany, strFilterIndustry, strFilterSalary;
-    private ArrayList<String> arrFilterLocationIDs, arrFilterCompanyIDs, arrFilterIndustryIDs, arrFilterSalaryIDs;
-    private LinearLayout layoutFilterLocation, layoutFilterCompany, layoutFilterIndustry, layoutFilterSalary;
+    private ArrayList<Integer> arrFilterLocationIDs, arrFilterCompanyIDs, arrFilterIndustryIDs, arrFilterSalaryIDs;
     private TextView txtFilterLocation, txtFilterCompany, txtFilterIndustry, txtFilterSalary;
-    private Button btnExecFilter;
-    private String strHighestEducatioIDs, strSkillsIDs, strLanguagesIDs;
-    private ArrayList<String> arrHighestEducatioIDs, arrSkillsIDs, arrLanguagesIDs;
+    private ArrayList<Integer> arrSkillsIDs, arrLanguagesIDs;
+    private Integer idHighestEducation;
     private EditText txtName;
     private EditText txtEmail;
     private EditText txtPhone;
     private EditText txtPassword;
     private EditText txtConfirmPassword;
-    private LinearLayout layoutHighestEducation, layoutSkills, layoutLanguages;
     private TextView txtHighestEducation, txtSkills, txtLanguages;
-    private Button btnUpdateProfile;
 
     private Typeface font, fontBold;
 
@@ -89,7 +79,6 @@ public class JobsActivity extends Activity {
         context = this;
         font = Typeface.createFromAsset(context.getAssets(), "fonts/Raleway-Light.ttf");
         fontBold = Typeface.createFromAsset(context.getAssets(), "fonts/Raleway-Bold.ttf");
-        user_id = Commons.getSharedPreferences(context).getString("user_id", "");
         findViewById(R.id.imgLogout).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -137,7 +126,6 @@ public class JobsActivity extends Activity {
         layoutFilter.setInAnimation(inAnimation);
 //        layoutFilter.setOutAnimation(outAnimation);
 
-        viewCount = viewFlipper.getChildCount();
         refreshJobsList();
 
         findViewById(R.id.tabHome).setOnClickListener(new View.OnClickListener() {
@@ -286,10 +274,10 @@ public class JobsActivity extends Activity {
 
         });
 
-        layoutFilterLocation = (LinearLayout) findViewById(R.id.layoutFilterLocation);
-        layoutFilterCompany = (LinearLayout) findViewById(R.id.layoutFilterCompany);
-        layoutFilterIndustry = (LinearLayout) findViewById(R.id.layoutFilterIndustry);
-        layoutFilterSalary = (LinearLayout) findViewById(R.id.layoutFilterSalary);
+        LinearLayout layoutFilterLocation = (LinearLayout) findViewById(R.id.layoutFilterLocation);
+        LinearLayout layoutFilterCompany = (LinearLayout) findViewById(R.id.layoutFilterCompany);
+        LinearLayout layoutFilterIndustry = (LinearLayout) findViewById(R.id.layoutFilterIndustry);
+        LinearLayout layoutFilterSalary = (LinearLayout) findViewById(R.id.layoutFilterSalary);
 
         txtFilterLocation = (TextView) findViewById(R.id.txtFilterLocation);
         txtFilterCompany = (TextView) findViewById(R.id.txtFilterCompany);
@@ -301,7 +289,7 @@ public class JobsActivity extends Activity {
         txtFilterIndustry.setTypeface(font);
         txtFilterSalary.setTypeface(font);
 
-        btnExecFilter = (Button) findViewById(R.id.btnExecFilter);
+        Button btnExecFilter = (Button) findViewById(R.id.btnExecFilter);
         btnExecFilter.setTypeface(fontBold);
 
         layoutFilterLocation.setOnClickListener(new View.OnClickListener() {
@@ -356,40 +344,34 @@ public class JobsActivity extends Activity {
         btnExecFilter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (Commons.IS_NETWORK_TEST_EMULATED) {
-//            callbackGetJobsRequest(TestNetwork.request(
-//                            TestNetwork.getSampleGetJobsRequest(TestNetwork.TYPE_DEFAULT))
-//            );
-                } else {
-                    final ProgressDialog progress = Commons.getCustomProgressDialog(context);
+                final ProgressDialog progress = Commons.getCustomProgressDialog(context);
 
-                    Builders.Any.B a = Ion.with(getApplicationContext())
-                            .load(Commons.HTTP_GET, Commons.URL_JOBS)
-                            .setLogging("Ion Request", Log.DEBUG)
-                                    // location, company, industry, salary
+                Builders.Any.B a = Ion.with(getApplicationContext())
+                        .load(Commons.HTTP_GET, Commons.URL_JOBS)
+                        .setLogging("Ion Request", Log.DEBUG)
+                                // location, company, industry, salary
 
-                            .followRedirect(true);
+                        .followRedirect(true);
 
 
-                    Builders.Any.U b = null;
-                    if (strFilterLocation != null) if (!strFilterLocation.isEmpty())
-                        b = a.setBodyParameter("filter_location", strFilterLocation);
-                    if (strFilterCompany != null) if (!strFilterCompany.isEmpty())
-                        b = (b == null ? a : b).setBodyParameter("filter_company", strFilterCompany);
-                    if (strFilterIndustry != null) if (!strFilterIndustry.isEmpty())
-                        b = (b == null ? a : b).setBodyParameter("filter_industry", strFilterIndustry);
-                    if (strFilterSalary != null) if (!strFilterSalary.isEmpty())
-                        b = (b == null ? a : b).setBodyParameter("filter_salary", strFilterSalary);
-                    (b == null ? a : b).asJsonArray()
-                            .setCallback(new FutureCallback<JsonArray>() {
-                                @Override
-                                public void onCompleted(Exception e, JsonArray result) {
-                                    progress.dismiss();
-                                    callbackGetJobsRequest(result);
-                                }
-                            });
-                    //TODO Actual network request here; Callbacks: callbackInitRequest()
-                }
+                Builders.Any.U b = null;
+//                    if (strFilterLocation != null) if (!strFilterLocation.isEmpty())
+//                        b = a.setBodyParameter("filter_location", strFilterLocation);
+//                    if (strFilterCompany != null) if (!strFilterCompany.isEmpty())
+//                        b = (b == null ? a : b).setBodyParameter("filter_company", strFilterCompany);
+//                    if (strFilterIndustry != null) if (!strFilterIndustry.isEmpty())
+//                        b = (b == null ? a : b).setBodyParameter("filter_industry", strFilterIndustry);
+//                    if (strFilterSalary != null) if (!strFilterSalary.isEmpty())
+//                        b = (b == null ? a : b).setBodyParameter("filter_salary", strFilterSalary);
+                (b == null ? a : b).asJsonArray()
+                        .setCallback(new FutureCallback<JsonArray>() {
+                            @Override
+                            public void onCompleted(Exception e, JsonArray result) {
+                                progress.dismiss();
+                                callbackGetJobsRequest(result);
+                            }
+                        });
+
                 layoutFilter.setVisibility(View.GONE);
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
                     imgTabFilter.setImageDrawable(getResources().getDrawable(R.drawable.ic_tab_filter_white));
@@ -414,9 +396,9 @@ public class JobsActivity extends Activity {
         txtSkills.setTypeface(font);
         txtLanguages.setTypeface(font);
 
-        layoutHighestEducation = (LinearLayout) findViewById(R.id.layoutHighestEducation);
-        layoutSkills = (LinearLayout) findViewById(R.id.layoutSkills);
-        layoutLanguages = (LinearLayout) findViewById(R.id.layoutLanguages);
+        LinearLayout layoutHighestEducation = (LinearLayout) findViewById(R.id.layoutHighestEducation);
+        LinearLayout layoutSkills = (LinearLayout) findViewById(R.id.layoutSkills);
+        LinearLayout layoutLanguages = (LinearLayout) findViewById(R.id.layoutLanguages);
 
         layoutHighestEducation.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -425,7 +407,7 @@ public class JobsActivity extends Activity {
                         context,
                         SimpleContainer.CONTAINER_TYPE_EDUCATION2,
                         Commons.educationList.getElementList(),
-                        arrHighestEducatioIDs
+                        idHighestEducation == null ? new ArrayList<Integer>() : new ArrayList<Integer>(idHighestEducation)
                 )
                         .show(getFragmentManager(), "");
             }
@@ -455,22 +437,23 @@ public class JobsActivity extends Activity {
             }
         });
 
-        btnUpdateProfile = (Button) findViewById(R.id.btnUpdateProfile);
+        Button btnUpdateProfile = (Button) findViewById(R.id.btnUpdateProfile);
         btnUpdateProfile.setTypeface(fontBold);
         btnUpdateProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 final ProgressDialog progress = Commons.getCustomProgressDialog(context);
                 JsonObject requestJson = new JsonObject();
+                requestJson.addProperty("id", Commons.currentUser.getId());
                 requestJson.addProperty("name", txtName.getText().toString().trim());
                 requestJson.addProperty("email", txtEmail.getText().toString().trim());
                 requestJson.addProperty("phone", txtPhone.getText().toString().trim());
-                requestJson.addProperty("highest_education", strHighestEducatioIDs);
-                requestJson.addProperty("skills", strSkillsIDs);
-                requestJson.addProperty("language", strLanguagesIDs);
+                requestJson.addProperty("highest_education", idHighestEducation);
+//                requestJson.addProperty("skills", strSkillsIDs);
+//                requestJson.addProperty("language", strLanguagesIDs);
                 Log.d("Ion Request", "Request Json is : " + requestJson.toString());
                 Ion.with(getApplicationContext())
-                        .load(Commons.HTTP_PUT, Commons.URL_USERS + "/" + Commons.getSharedPreferences(context).getString("user_id", ""))
+                        .load(Commons.HTTP_PUT, Commons.URL_USERS + "/" + Commons.currentUser.getId() + ".json")
                         .setLogging("Ion Request", Log.DEBUG)
                         .followRedirect(true)
                         .setJsonObjectBody(requestJson)
@@ -512,93 +495,68 @@ public class JobsActivity extends Activity {
     }
 
     private void loadSavedAndAppliedJobs() {
-        if (Commons.IS_NETWORK_TEST_EMULATED) {
-//            callbackGetSavedAppliedJobsRequest(TestNetwork.request(
-//                            TestNetwork.getSampleGetJSavedAppliedobsRequest(TestNetwork.TYPE_DEFAULT))
-//            );
-        } else {
-            //TODO Actual network request here; Callbacks: callbackInitRequest()
-            final ProgressDialog progress = Commons.getCustomProgressDialog(context);
-            Ion.with(getApplicationContext())
-                    .load(Commons.HTTP_GET, Commons.URL_SAVED_APPLIED_JOBS)
-                    .setLogging("Ion Request", Log.DEBUG)
-                    .followRedirect(true)
-                    .asJsonArray()
-                    .setCallback(new FutureCallback<JsonArray>() {
-                        @Override
-                        public void onCompleted(Exception e, JsonArray result) {
-                            progress.dismiss();
-                            callbackGetSavedAppliedJobsRequest(result);
-                        }
-                    });
-        }
+        final ProgressDialog progress = Commons.getCustomProgressDialog(context);
+        Ion.with(getApplicationContext())
+                .load(Commons.HTTP_GET, Commons.URL_SAVED_APPLIED_JOBS)
+                .setLogging("Ion Request", Log.DEBUG)
+                .followRedirect(true)
+                .setBodyParameter("user_id", Commons.currentUser.getId() + "")
+                .asJsonArray()
+                .setCallback(new FutureCallback<JsonArray>() {
+                    @Override
+                    public void onCompleted(Exception e, JsonArray result) {
+                        progress.dismiss();
+                        callbackGetSavedAppliedJobsRequest(result);
+                    }
+                });
+
     }
 
     private void refreshJobsList() {
-        if (Commons.IS_NETWORK_TEST_EMULATED) {
-//            callbackGetJobsRequest(TestNetwork.request(
-//                            TestNetwork.getSampleGetJobsRequest(TestNetwork.TYPE_DEFAULT))
-//            );
-        } else {
-            final ProgressDialog progress = Commons.getCustomProgressDialog(context);
-            Ion.with(getApplicationContext())
-                    .load(Commons.HTTP_GET, Commons.URL_JOBS)
-                    .setLogging("Ion Request", Log.DEBUG)
-                    .followRedirect(true)
-                    .asJsonArray()
-                    .setCallback(new FutureCallback<JsonArray>() {
-                        @Override
-                        public void onCompleted(Exception e, JsonArray result) {
-                            progress.dismiss();
-                            callbackGetJobsRequest(result);
-                        }
-                    });
-            //TODO Actual network request here; Callbacks: callbackInitRequest()
-        }
+        final ProgressDialog progress = Commons.getCustomProgressDialog(context);
+        Ion.with(getApplicationContext())
+                .load(Commons.HTTP_GET, Commons.URL_JOBS)
+                .setLogging("Ion Request", Log.DEBUG)
+                .followRedirect(true)
+                .setBodyParameter("mobile", "")
+                .asJsonArray()
+                .setCallback(new FutureCallback<JsonArray>() {
+                    @Override
+                    public void onCompleted(Exception e, JsonArray result) {
+                        progress.dismiss();
+                        callbackGetJobsRequest(result);
+                    }
+                });
     }
 
+
     private void loadProfileData() {
-        SharedPreferences prefs = Commons.getSharedPreferences(context);
-        txtName.setText(prefs.getString("name", ""));
-        txtEmail.setText(prefs.getString("email", ""));
-        txtPhone.setText(prefs.getString("phone", ""));
+        txtName.setText(Commons.currentUser.getName());
+        txtEmail.setText(Commons.currentUser.getEmail());
+        txtPhone.setText(Commons.currentUser.getPhone());
+        txtHighestEducation.setText(
+                Commons.educationList.getBlockByID(
+                        Commons.currentUser.getQualification_id()
+                ).getTitle()
+        );
 
-        strHighestEducatioIDs = prefs.getString("highest_education", "");
-        strSkillsIDs = prefs.getString("skills", "");
-        strLanguagesIDs = prefs.getString("language", "");
-
-        arrHighestEducatioIDs = new ArrayList<>(Arrays.asList(strHighestEducatioIDs.split(",")));
         txtHighestEducation.setText("");
-        if (arrHighestEducatioIDs.size() == 0)
+        if (idHighestEducation == null)
             txtHighestEducation.setText("None Selected");
-        for (int i = 0; i < arrHighestEducatioIDs.size(); i++) {
-            txtHighestEducation
-                    .append(Commons.educationList.getElementList().get(i).getTitle());
-            if (i != arrHighestEducatioIDs.size() - 1)
-                txtHighestEducation.append(", ");
-        }
+        else
+            txtHighestEducation.setText(Commons.educationList.getBlockByID(idHighestEducation).getTitle());
 
-        arrSkillsIDs = new ArrayList<>(Arrays.asList(strSkillsIDs.split(",")));
         txtSkills.setText("");
         if (arrSkillsIDs.size() == 0)
             txtSkills.setText("None Selected");
-        for (int i = 0; i < arrSkillsIDs.size(); i++) {
-            txtSkills
-                    .append(Commons.skillsList.getElementList().get(i).getTitle());
-            if (i != arrSkillsIDs.size() - 1)
-                txtSkills.append(", ");
-        }
+        else
+            txtSkills.setText(Commons.skillsList.getTitles());
 
-        arrLanguagesIDs = new ArrayList<>(Arrays.asList(strLanguagesIDs.split(",")));
         txtLanguages.setText("");
         if (arrLanguagesIDs.size() == 0)
             txtLanguages.setText("None Selected");
-        for (int i = 0; i < arrLanguagesIDs.size(); i++) {
-            txtLanguages
-                    .append(Commons.languageList.getElementList().get(i).getTitle());
-            if (i != arrLanguagesIDs.size() - 1)
-                txtLanguages.append(", ");
-        }
+        else
+            txtSkills.setText(Commons.languageList.getTitles());
     }
 
     private void callbackGetJobsRequest(JsonArray responseObject) {
@@ -611,7 +569,7 @@ public class JobsActivity extends Activity {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
                     Intent intent = new Intent(context, JobActivity.class);
-                    intent.putExtra("position", position);
+                    intent.putExtra("jobID", jobs.getJobByIndex(position).get_id());
                     startActivity(intent);
                 }
             });
@@ -625,33 +583,9 @@ public class JobsActivity extends Activity {
     }
 
     private void callbackGetSavedAppliedJobsRequest(JsonArray responseObject) {
-        if(responseObject == null)
+        if (responseObject == null)
             return;
-        System.out.println(responseObject.toString());
-        final List<JobsContainer.Job> savedJobs = new ArrayList<>();
-        final List<JobsContainer.Job> appliedJobs = new ArrayList<>();
-        final SavedAppliedJobsContainer objSavedAppliedJobs = new SavedAppliedJobsContainer(responseObject);
-        for (int i = 0; i < jobs.getListJobs().size(); i++) {
-
-            JobsContainer.Job job = jobs.getJob(i);
-            if (Commons.SHOW_DEBUG_MSGS)
-                Log.d(TAG, "Matching job " + i + " with job_id(" + job.getJob_id() + ") and user_id(" + user_id + ")");
-            SavedAppliedJobsContainer.SavedAppliedStub match = objSavedAppliedJobs.getMatchingSavedAppliedStub(job.getJob_id(), user_id);
-            if (match != null) {
-                if (Commons.SHOW_DEBUG_MSGS)
-                    Log.d(TAG, "Match found: Match status is " + match.getStatus());
-                if (match.getStatus().equals(SavedAppliedJobsContainer.JOB_STATUS_SAVED)) {
-                    savedJobs.add(job);
-                    if (Commons.SHOW_DEBUG_MSGS)
-                        Log.d(TAG, "Added saved job");
-                }
-                if (match.getStatus().equals(SavedAppliedJobsContainer.JOB_STATUS_APPLIED)) {
-                    appliedJobs.add(job);
-                    if (Commons.SHOW_DEBUG_MSGS)
-                        Log.d(TAG, "Added applied job");
-                }
-            }
-        }
+        Commons.currentUser.setSavedAppliedJobs(responseObject);
 
         if (jobs.getListJobs().size() != 0) {
             if (Commons.SHOW_DEBUG_MSGS)
@@ -664,6 +598,7 @@ public class JobsActivity extends Activity {
             layoutSavedJobsContainer.removeAllViews();
             layoutAppliedJobsContainer.removeAllViews();
             TextView lblJobTitle, lblJobLocation, lblPostDate;
+            final List<Integer> savedJobs = Commons.currentUser.getSavedAppliedJobs().getSavedJobIDs();
             for (int i = 0; i < savedJobs.size(); i++) {
                 if (Commons.SHOW_DEBUG_MSGS)
                     Log.d(TAG, "Rendered saved job");
@@ -677,9 +612,9 @@ public class JobsActivity extends Activity {
                 lblJobLocation.setTypeface(fontBold);
                 lblPostDate.setTypeface(fontBold);
 
-                JobsContainer.Job jobA = savedJobs.get(i);
+                final JobsContainer.Job jobA = jobs.getJobByID(savedJobs.get(i));
                 lblJobTitle.setText(jobA.getTitle());
-                lblJobLocation.setText(Commons.locationList.getBlockByID(jobA.getLocation_city()).getTitle());
+                lblJobLocation.setText(Commons.locationList.getBlockByID(jobA.getLocation_id()).getTitle());
                 lblPostDate.setText(jobA.getPosted_date());
                 final int pos = i;
                 layoutSavedJobsContainer.addView(rowView);
@@ -687,11 +622,13 @@ public class JobsActivity extends Activity {
                     @Override
                     public void onClick(View v) {
                         Intent intent = new Intent(context, JobActivity.class);
-                        intent.putExtra("position", jobs.getPosition(savedJobs.get(pos).getJob_id()));
+                        intent.putExtra("jobID", jobA.get_id());
                         startActivity(intent);
                     }
                 });
             }
+
+            final List<Integer> appliedJobs = Commons.currentUser.getSavedAppliedJobs().getAppliedJobIDs();
             for (int i = 0; i < appliedJobs.size(); i++) {
                 if (Commons.SHOW_DEBUG_MSGS)
                     Log.d(TAG, "Rendered applied job");
@@ -705,9 +642,9 @@ public class JobsActivity extends Activity {
                 lblJobLocation.setTypeface(fontBold);
                 lblPostDate.setTypeface(fontBold);
 
-                JobsContainer.Job jobA = appliedJobs.get(i);
+                final JobsContainer.Job jobA = jobs.getJobByID(appliedJobs.get(i));
                 lblJobTitle.setText(jobA.getTitle());
-                lblJobLocation.setText(Commons.locationList.getBlockByID(jobA.getLocation_city()).getTitle());
+                lblJobLocation.setText(Commons.locationList.getBlockByID(jobA.getLocation_id()).getTitle());
                 lblPostDate.setText(jobA.getPosted_date());
                 final int pos = i;
                 layoutAppliedJobsContainer.addView(rowView);
@@ -715,7 +652,7 @@ public class JobsActivity extends Activity {
                     @Override
                     public void onClick(View v) {
                         Intent intent = new Intent(context, JobActivity.class);
-                        intent.putExtra("position", jobs.getPosition(appliedJobs.get(pos).getJob_id()));
+                        intent.putExtra("jobID", jobA.get_id());
                         startActivity(intent);
                     }
                 });
@@ -764,7 +701,7 @@ public class JobsActivity extends Activity {
         }
     }
 
-    public void onMultiselectCompleted(int tag, ArrayList<String> ids) {
+    public void onMultiselectCompleted(int tag, ArrayList<Integer> ids) {
         String strIDs = "";
         for (int i = 0; i < ids.size(); i++) {
             strIDs += ids.get(i) + ((i != ids.size() - 1) ? "," : "");
@@ -773,31 +710,24 @@ public class JobsActivity extends Activity {
         switch (tag) {
             case SimpleContainer.CONTAINER_TYPE_LOCATIONS:
                 arrFilterLocationIDs = ids;
-                strFilterLocation = strIDs;
                 break;
             case SimpleContainer.CONTAINER_TYPE_COMPANIES:
                 arrFilterCompanyIDs = ids;
-                strFilterCompany = strIDs;
                 break;
             case SimpleContainer.CONTAINER_TYPE_INDUSTRIES:
                 arrFilterIndustryIDs = ids;
-                strFilterIndustry = strIDs;
                 break;
             case SimpleContainer.CONTAINER_TYPE_SALARY_RANGES:
                 arrFilterSalaryIDs = ids;
-                strFilterSalary = strIDs;
                 break;
             case SimpleContainer.CONTAINER_TYPE_EDUCATION2:
-                arrHighestEducatioIDs = ids;
-                strHighestEducatioIDs = strIDs;
+                idHighestEducation = ids.get(0);
                 break;
             case SimpleContainer.CONTAINER_TYPE_SKILLS2:
                 arrSkillsIDs = ids;
-                strSkillsIDs = strIDs;
                 break;
             case SimpleContainer.CONTAINER_TYPE_LANGUAGES2:
                 arrLanguagesIDs = ids;
-                strLanguagesIDs = strIDs;
                 break;
             default:
                 return;
@@ -805,7 +735,7 @@ public class JobsActivity extends Activity {
         refreshStoresText(tag, ids);
     }
 
-    private void refreshStoresText(int tag, ArrayList<String> ids) {
+    private void refreshStoresText(int tag, ArrayList<Integer> ids) {
         TextView textViewToUpdate;
         SimpleContainer listElements = null;
         CompanyContainer companyList = null;

@@ -39,10 +39,8 @@ public class QuestionnaireActivity extends Activity {
     private static final String TAG = "JobActivity";
     private final boolean isLeftRight = true;
     private final boolean autoMoveToNextQuestion = true;
-    private JobsContainer jobs;
-    private String user_id;
+    private JobsContainer.Job job;
     private Context context;
-    private int position = 0;
     private Typeface font, fontBold;
     private Map<Integer, Integer> answers;
     private Map<Integer, List<SwipeLayout>> refOptions;
@@ -84,19 +82,20 @@ public class QuestionnaireActivity extends Activity {
             exit_b = R.anim.slide_down_out;
         }
 
-        jobs = JobsActivity.jobs;
-        user_id = JobsActivity.user_id;
         context = this;
-        position = getIntent().getIntExtra("position", 0);
+        job = JobsActivity.jobs.getJobByID(getIntent().getIntExtra("jobID", 0));
         font = Typeface.createFromAsset(context.getAssets(), "fonts/Raleway-Light.ttf");
         fontBold = Typeface.createFromAsset(context.getAssets(), "fonts/Raleway-Bold.ttf");
         answers = new HashMap<>();
         refOptions = new HashMap<>();
-        requestQuestionnaire();
+//        requestQuestionnaire();
+
 
         viewFlipper = (ViewFlipper) findViewById(R.id.layoutQuestionnaire);
         layoutSummary = (LinearLayout) findViewById(R.id.layoutSummary);
         layoutPagination = (TextView) findViewById(R.id.layoutPagination);
+
+        renderQuestionnaire(job.getQuestionnaire());
 
         Button btnApply = (Button) findViewById(R.id.btnApply);
         btnApply.setOnClickListener(new View.OnClickListener() {
@@ -251,15 +250,12 @@ public class QuestionnaireActivity extends Activity {
 
     private void requestQuestionnaire() {
         final ProgressDialog progress = Commons.getCustomProgressDialog(context);
-        JsonObject requestJson = new JsonObject();
-        requestJson.addProperty("job_id", jobs.getJob(position).getJob_id());
-        Log.d("Ion Request", "Request Json is : " + requestJson.toString());
         Ion.with(getApplicationContext())
                 .load(Commons.HTTP_GET, Commons.URL_QUESTIONNAIRE)
                 .setLogging("Ion Request", Log.DEBUG)
                 .followRedirect(true)
-                .setBodyParameter("job_id", jobs.getJob(position).getJob_id())
-                .setBodyParameter("user_id", user_id)
+                .setBodyParameter("job_id", job.get_id() + "")
+                .setBodyParameter("user_id", Commons.currentUser.getId() + "")
 //                .setJsonObjectBody(requestJson)
                 .asJsonArray()
                 .setCallback(new FutureCallback<JsonArray>() {
@@ -325,8 +321,8 @@ public class QuestionnaireActivity extends Activity {
                 public void onClick(DialogInterface dialog, int which) {
                     final ProgressDialog progress = Commons.getCustomProgressDialog(context);
                     JsonObject requestJson = new JsonObject();
-                    requestJson.addProperty("user_id", user_id);
-                    requestJson.addProperty("job_id", jobs.getJob(position).getJob_id());
+                    requestJson.addProperty("user_id", Commons.currentUser.getId());
+                    requestJson.addProperty("job_id", job.get_id());
                     requestJson.addProperty("questionnaire_answers", finalStrAnswer);
                     requestJson.addProperty("status", SavedAppliedJobsContainer.JOB_STATUS_APPLIED);
                     Log.d("Ion Request", "Request Json is : " + requestJson.toString());

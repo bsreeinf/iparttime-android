@@ -4,20 +4,37 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
  * Created by bsreeinf on 06/07/15.
  */
 public class SavedAppliedJobsContainer {
-    public static final String JOB_STATUS_APPLIED = "0";
-    public static final String JOB_STATUS_SAVED = "1";
+    public static final int JOB_STATUS_APPLIED = 1;
+    public static final int JOB_STATUS_SAVED = 2;
+    public static final int JOB_STATUS_ACCEPTED = 3;
+    public static final int JOB_STATUS_REJECTED = 4;
     private List<SavedAppliedStub> listSavedAppliedJobs;
+    private HashMap<Integer, SavedAppliedStub> map;
+    private List<Integer> savedJobIDs;
+    private List<Integer> appliedJobIDs;
+
 
     public SavedAppliedJobsContainer(JsonArray arrSavedAppliedJobs) {
         listSavedAppliedJobs = new ArrayList<>();
+        savedJobIDs = new ArrayList<>();
+        appliedJobIDs = new ArrayList<>();
+
+        map = new HashMap<>();
         for (int i = 0; i < arrSavedAppliedJobs.size(); i++) {
             listSavedAppliedJobs.add(new SavedAppliedStub(arrSavedAppliedJobs.get(i).getAsJsonObject()));
+            map.put(listSavedAppliedJobs.get(i).getId(), listSavedAppliedJobs.get(i));
+
+            if (listSavedAppliedJobs.get(i).getStatus() == SavedAppliedJobsContainer.JOB_STATUS_SAVED)
+                savedJobIDs.add(listSavedAppliedJobs.get(i).getId());
+            else if (listSavedAppliedJobs.get(i).getStatus() == SavedAppliedJobsContainer.JOB_STATUS_APPLIED)
+                appliedJobIDs.add(listSavedAppliedJobs.get(i).getId());
         }
     }
 
@@ -25,47 +42,43 @@ public class SavedAppliedJobsContainer {
         return listSavedAppliedJobs;
     }
 
+    public List<Integer> getSavedJobIDs() {
+        return savedJobIDs;
+    }
+
+    public List<Integer> getAppliedJobIDs() {
+        return appliedJobIDs;
+    }
+
     public SavedAppliedStub getSavedAppliedStub(int index) {
         return listSavedAppliedJobs.get(index);
     }
 
-    public SavedAppliedStub getMatchingSavedAppliedStub(String job_id, String user_id) {
-        for (int i = 0; i < listSavedAppliedJobs.size(); i++) {
-            SavedAppliedStub stub = listSavedAppliedJobs.get(i);
-            if (stub.getJob_id().equals(job_id) && stub.getUser_id().equals(user_id)) {
-                return stub;
-            }
-        }
-        return null;
+    public SavedAppliedStub getMatchingSavedAppliedStub(int job_id) {
+        return map.get(job_id);
     }
 
     public class SavedAppliedStub {
-        private String id;
-        private String job_id;
-        private String user_id;
-        private String status;
+        private int id;
+        private int job_id;
+        private int status;
 
         public SavedAppliedStub(JsonObject objJob) {
-            this.id = objJob.get("id").getAsString();
-            this.user_id = objJob.get("user_id").getAsString();
-            this.job_id = objJob.get("job_id").getAsString();
-            this.status = objJob.get("status").getAsString();
-            System.out.println("Row: " + user_id + " " + job_id + " " + status);
+            this.id = objJob.get("id").getAsInt();
+            this.job_id = objJob.get("job_id").getAsInt();
+            this.status = objJob.get("job_status_id").getAsInt();
+            System.out.println("Row: " + job_id + " " + status);
         }
 
-        public String getJob_id() {
+        public int getJob_id() {
             return job_id;
         }
 
-        public String getId() {
+        public int getId() {
             return id;
         }
 
-        public String getUser_id() {
-            return user_id;
-        }
-
-        public String getStatus() {
+        public int getStatus() {
             return status;
         }
     }

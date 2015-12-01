@@ -26,7 +26,6 @@ import java.util.regex.Pattern;
 
 public class Commons {
 
-    public static final boolean IS_NETWORK_TEST_EMULATED = false;
     public static final String USER_LOGGED_IN = "isUserLoggerIn";
     public static final int progressColor = 0xFF00ADEF;
     public static final boolean SHOW_DEBUG_MSGS = true;
@@ -47,10 +46,10 @@ public class Commons {
     public static SimpleContainer skillsList;
     public static SimpleContainer languageList;
     public static SimpleContainer locationList;
-    public static SimpleContainer jobFunctionList;
     public static SimpleContainer salaryRangeList;
     public static SimpleContainer industryList;
     public static CompanyContainer companyList;
+    public static User currentUser;
 
     // Shared Preferences Constants
     private static SharedPreferences pref = null;
@@ -69,14 +68,14 @@ public class Commons {
 //        if (!ip.trim().isEmpty()) {
 //            server_ip = ip;
 //        }
-//        serverAddress = "http://192.168.1.80:3000";
-        serverAddress = "https://safe-ocean-9547.herokuapp.com";
-        URL_INIT = serverAddress + "/init";
-        URL_USERS = serverAddress + "/users";
+        serverAddress = "http://192.168.1.3:3000";
+//        serverAddress = "https://nexjobs.herokuapp.com";
+        URL_INIT = serverAddress + "/init.json";
+        URL_USERS = serverAddress + "/users.json";
         URL_USER = serverAddress + "/user";
-        URL_LOGIN = serverAddress + "/login";
+        URL_LOGIN = serverAddress + "/login_device.json";
         URL_JOB = serverAddress + "/job";
-        URL_JOBS = serverAddress + "/jobs";
+        URL_JOBS = serverAddress + "/jobs.json";
         URL_SAVED_APPLIED_JOBS = serverAddress + "/saved_applied_jobs";
         URL_QUESTIONNAIRE = serverAddress + "/questionnaires";
     }
