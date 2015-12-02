@@ -68,8 +68,8 @@ public class Commons {
 //        if (!ip.trim().isEmpty()) {
 //            server_ip = ip;
 //        }
-        serverAddress = "http://192.168.1.3:3000";
-//        serverAddress = "https://nexjobs.herokuapp.com";
+//        serverAddress = "http://192.168.1.3:3000";
+        serverAddress = "https://nexjobs.herokuapp.com";
         URL_INIT = serverAddress + "/init.json";
         URL_USERS = serverAddress + "/users.json";
         URL_USER = serverAddress + "/users";

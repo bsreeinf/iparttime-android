@@ -22,7 +22,7 @@ public class User {
     public User(JsonObject data) {
         this.skills = new ArrayList<>();
         this.languages = new ArrayList<>();
-        this.savedAppliedJobs = new SavedAppliedJobsContainer(data.get("saved_applied_jobs").getAsJsonArray());
+//        this.savedAppliedJobs = new SavedAppliedJobsContainer(data.get("saved_applied_jobs").getAsJsonArray());
 
         this.id = data.get("id").getAsInt();
         this.qualification_id = data.get("qualification_id").toString().equals("null") ? -1 : data.get("qualification_id").getAsInt();
