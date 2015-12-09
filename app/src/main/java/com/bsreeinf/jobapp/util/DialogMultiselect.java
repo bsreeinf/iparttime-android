@@ -8,9 +8,9 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.LinearLayout;
-import android.widget.Switch;
-import android.widget.Toast;
 
 import com.bsreeinf.jobapp.MainActivity;
 import com.bsreeinf.jobapp.R;
@@ -43,7 +43,10 @@ public class DialogMultiselect extends DialogFragment {
         View view = LayoutInflater.from(context).inflate(
                 R.layout.dialog_multiselect, null);
         listItems = (LinearLayout) view.findViewById(R.id.listItems);
+
         fillSpinnerData();
+        setCheckBoxListeners();
+
         switch (tag) {
             case SimpleContainer.CONTAINER_TYPE_EDUCATION:
             case SimpleContainer.CONTAINER_TYPE_EDUCATION2:
@@ -77,37 +80,13 @@ public class DialogMultiselect extends DialogFragment {
         builder1.setPositiveButton("DONE",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        if (tag == SimpleContainer.CONTAINER_TYPE_EDUCATION ||
-                                tag == SimpleContainer.CONTAINER_TYPE_EDUCATION2) {
-                            int count = 0;
-                            for (int i = 0; i < listItems.getChildCount(); i++) {
-                                View v = listItems.getChildAt(i);
-                                if (v instanceof LinearLayout) {
-                                    Switch temp = (Switch) ((LinearLayout) v)
-                                            .getChildAt(0);
-                                    if (temp.isChecked()) {
-                                        count++;
-                                    }
-                                }
-                            }
-                            if (count > 1) {
-                                Toast.makeText(context, "Select only one", Toast.LENGTH_SHORT).show();
-                                return;
-                            } else if (count == 0) {
-                                Toast.makeText(context, "Select at least one", Toast.LENGTH_SHORT).show();
-                                return;
-                            }
-                        }
                         ids = new ArrayList<>();
                         for (int i = 0; i < listItems.getChildCount(); i++) {
-                            View v = listItems.getChildAt(i);
-                            if (v instanceof LinearLayout) {
-                                Switch temp = (Switch) ((LinearLayout) v)
-                                        .getChildAt(0);
-                                if (temp.isChecked()) {
-                                    ids.add(listElemnts.get(i).getId());
-                                    System.out.println("id " + i + ": " + listElemnts.get(i).getId());
-                                }
+
+                            CheckBox temp = (CheckBox) listItems.getChildAt(i);
+                            if (temp.isChecked()) {
+                                ids.add(listElemnts.get(i).getId());
+                                System.out.println("id " + i + ": " + listElemnts.get(i).getId());
                             }
                         }
                         switch (tag) {
@@ -138,9 +117,8 @@ public class DialogMultiselect extends DialogFragment {
 
     private void fillSpinnerData() {
         for (int i = 0; i < listElemnts.size(); i++) {
-            LinearLayout switchLayout = (LinearLayout) LayoutInflater.from(
+            CheckBox viewSwitch = (CheckBox) LayoutInflater.from(
                     context).inflate(R.layout.row_switch, null);
-            Switch viewSwitch = (Switch) switchLayout.findViewById(R.id.viewSwitch);
             viewSwitch.setText(listElemnts.get(i).getTitle());
             if (ids != null) {
                 viewSwitch.setChecked(false);
@@ -151,7 +129,25 @@ public class DialogMultiselect extends DialogFragment {
                     }
                 }
             }
-            listItems.addView(switchLayout);
+            listItems.addView(viewSwitch);
+        }
+    }
+
+    private void setCheckBoxListeners(){
+        for (int i = 0; i < listItems.getChildCount(); i++) {
+            final CheckBox chk = (CheckBox) listItems.getChildAt(i);
+            chk.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (tag == SimpleContainer.CONTAINER_TYPE_EDUCATION || tag ==
+                            SimpleContainer.CONTAINER_TYPE_EDUCATION2) {
+                        for (int j = 0; j < listItems.getChildCount(); j++) {
+                            ((CheckBox) listItems.getChildAt(j)).setChecked(false);
+                        }
+                        chk.setChecked(true);
+                    }
+                }
+            });
         }
     }
 }

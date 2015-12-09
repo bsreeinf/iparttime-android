@@ -50,7 +50,7 @@ public class CompanyContainer {
             this.name = company.get("name").getAsString();
             this.phone = company.get("phone").getAsString();
             this.email = company.get("email").getAsString();
-            this.address = company.get("address").getAsString();
+            this.address = ""; //company.get("address") == null ? "" : company.get("address").getAsString();
         }
 
         public int getId() {

@@ -153,7 +153,7 @@ public class QuestionnaireActivity extends Activity {
 
                 txtOption.setText(option.getOption() + "");
                 txtOption.setTypeface(font);
-                refOptions.put(i, layoutOption);
+                refOptions.put(finalI, layoutOption);
 
                 final int finalJ = j;
                 layoutOption.setOnClickListener(new View.OnClickListener() {
@@ -169,9 +169,14 @@ public class QuestionnaireActivity extends Activity {
                             ((TextView) layoutSummary.getChildAt(finalI).findViewById(R.id.lblQuestion))
                                     .setText("Not Selected");
                         } else {
-                            refOptions.get(finalI).findViewById(R.id.lytBack).setBackgroundColor(Color.WHITE);
-                            ((TextView)refOptions.get(finalI).findViewById(R.id.txtOption)).setTextColor(ContextCompat.getColor(context,
-                                    R.color.app_dark_gray));
+                            try {
+                                refOptions.get(finalI).findViewById(R.id.lytBack).setBackgroundColor(Color.WHITE);
+                                ((TextView)refOptions.get(finalI).findViewById(R.id.txtOption)).setTextColor(ContextCompat.getColor(context,
+                                        R.color.app_dark_gray));
+                            }catch (Exception e){
+                                e.printStackTrace();
+                            }
+
 
                             refOptions.put(finalI, layoutOption);
 
@@ -201,11 +206,12 @@ public class QuestionnaireActivity extends Activity {
         }
         // Add summary page here
 
+        findViewById(R.id.lblSummary).setVisibility(View.VISIBLE);
         viewFlipper.showNext();
         viewFlipper.showPrevious();
         viewCount = viewFlipper.getChildCount();
         setSelectedPage(0);
-        findViewById(R.id.lblSummary).setVisibility(View.VISIBLE);
+
 
         Button btnPrevQuestion = (Button) findViewById(R.id.btnPrevQuestion);
         Button btnNextQuestion = (Button) findViewById(R.id.btnNextQuestion);
