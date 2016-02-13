@@ -62,8 +62,12 @@ public class JobsAdapter extends ArrayAdapter<SimpleContainer> {
         holder.txtJobDescription.setText(jobDescription);
         holder.txtSalary.setText("\u20B9 " + currBlock.getSalary_offered());
         if (!Commons.companyList.getCompanyByID(currBlock.getCompany_id()).getLogo_url().trim().equals("")) {
-            new Commons.DownloadImageTask(holder.imgCompanyLogo)
-                    .execute(Commons.companyList.getCompanyByID(currBlock.getCompany_id()).getLogo_url().trim());
+            try {
+                new Commons.DownloadImageTask(holder.imgCompanyLogo)
+                        .execute(Commons.companyList.getCompanyByID(currBlock.getCompany_id()).getLogo_url().trim());
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
 
         String salaryType;
