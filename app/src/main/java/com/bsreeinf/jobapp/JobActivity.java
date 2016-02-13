@@ -128,7 +128,7 @@ public class JobActivity extends Activity {
                 requestJson.addProperty("job_status_id", SavedAppliedJobsContainer.JOB_STATUS_SAVED);
                 JsonObject finalRequest = new JsonObject();
                 finalRequest.add("saved_applied_job", requestJson);
-                Log.d("Ion Request", "Request Json is : " + requestJson.toString());
+                Log.d("Ion Request", "Request Json is : " + finalRequest.toString());
                 Ion.with(getApplicationContext())
                         .load(Commons.HTTP_POST, Commons.URL_SAVE_APPLY_JOB)
                         .setLogging("Ion Request", Log.DEBUG)
@@ -179,7 +179,6 @@ public class JobActivity extends Activity {
                             requestJson.addProperty("job_status_id", SavedAppliedJobsContainer.JOB_STATUS_APPLIED);
                             JsonObject finalRequest = new JsonObject();
                             finalRequest.add("saved_applied_job", requestJson);
-
                             Log.d("Ion Request", "Request Json is : " + requestJson.toString());
                             Ion.with(getApplicationContext())
                                     .load(Commons.HTTP_POST, Commons.URL_SAVE_APPLY_JOB)

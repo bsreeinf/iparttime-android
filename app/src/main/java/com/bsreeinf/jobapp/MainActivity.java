@@ -349,20 +349,20 @@ public class MainActivity extends Activity {
                 Builders.Any.B a = Ion.with(getApplicationContext())
                         .load(Commons.HTTP_GET, Commons.URL_JOBS)
                         .setLogging("Ion Request", Log.DEBUG)
-                                // location, company, industry, salary
+
+                                                        // location, company, industry, salary
 
                         .followRedirect(true);
 
-
-                Builders.Any.U b = null;
-//                    if (strFilterLocation != null) if (!strFilterLocation.isEmpty())
-//                        b = a.setBodyParameter("filter_location", strFilterLocation);
-//                    if (strFilterCompany != null) if (!strFilterCompany.isEmpty())
-//                        b = (b == null ? a : b).setBodyParameter("filter_company", strFilterCompany);
-//                    if (strFilterIndustry != null) if (!strFilterIndustry.isEmpty())
-//                        b = (b == null ? a : b).setBodyParameter("filter_industry", strFilterIndustry);
-//                    if (strFilterSalary != null) if (!strFilterSalary.isEmpty())
-//                        b = (b == null ? a : b).setBodyParameter("filter_salary", strFilterSalary);
+                Builders.Any.U b = a.setBodyParameter("mobile", "");
+                    if (arrFilterLocationIDs != null) if (arrFilterLocationIDs.size() > 0)
+                        b = (b == null ? a : b).setBodyParameter("filter_location", arrFilterCompanyIDs.toString().replace("[", "").replace("]",""));
+                    if (arrFilterCompanyIDs != null) if (arrFilterCompanyIDs.size() > 0)
+                        b = (b == null ? a : b).setBodyParameter("filter_company", arrFilterCompanyIDs.toString().replace("[","").replace("]", ""));
+                    if (arrFilterIndustryIDs != null) if (arrFilterIndustryIDs.size() > 0)
+                        b = (b == null ? a : b).setBodyParameter("filter_industry", arrFilterIndustryIDs.toString().replace("[","").replace("]", ""));
+                    if (arrFilterSalaryIDs != null) if (arrFilterSalaryIDs.size() > 0)
+                        b = (b == null ? a : b).setBodyParameter("filter_salary", arrFilterSalaryIDs.toString().replace("[","").replace("]",""));
                 (b == null ? a : b).asJsonArray()
                         .setCallback(new FutureCallback<JsonArray>() {
                             @Override
@@ -457,12 +457,14 @@ public class MainActivity extends Activity {
                 requestJson.addProperty("qualification_id", idHighestEducation);
                 requestJson.addProperty("skills", arrSkillsIDs.toString());
                 requestJson.addProperty("languages", arrLanguagesIDs.toString());
-                Log.d("Ion Request", "Request Json is : " + requestJson.toString());
+                JsonObject tmp = new JsonObject();
+                tmp.add("user",requestJson);
+                Log.d("Ion Request", "Request Json is : " + tmp.toString());
                 Ion.with(getApplicationContext())
                         .load(Commons.HTTP_PUT, Commons.URL_USER + "/" + Commons.currentUser.getId() + ".json")
                         .setLogging("Ion Request", Log.DEBUG)
                         .followRedirect(true)
-                        .setJsonObjectBody(requestJson)
+                        .setJsonObjectBody(tmp)
                         .asJsonObject()
                         .setCallback(new FutureCallback<JsonObject>() {
                             @Override

@@ -102,12 +102,15 @@ public class RegisterUser extends Activity {
                 requestJson.addProperty("email", txtEmail.getText().toString().trim());
                 requestJson.addProperty("phone", txtPhone.getText().toString().trim());
                 requestJson.addProperty("password", txtPassword.getText().toString().trim());
-                Log.d("Ion Request", "Request Json is : " + requestJson.toString());
+                requestJson.addProperty("password_confirmation", txtPassword.getText().toString().trim());
+                JsonObject temp = new JsonObject();
+                temp.add("user", requestJson);
+                Log.d("Ion Request", "Request Json is : " + temp.toString());
                 Ion.with(getApplicationContext())
                         .load(Commons.HTTP_POST, Commons.URL_USERS)
                         .setLogging("Ion Request", Log.DEBUG)
                         .followRedirect(true)
-                        .setJsonObjectBody(requestJson)
+                        .setJsonObjectBody(temp)
                         .asJsonObject()
                         .setCallback(new FutureCallback<JsonObject>() {
                             @Override

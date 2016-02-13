@@ -4,18 +4,24 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.telephony.PhoneNumberUtils;
+import android.util.Log;
 import android.view.Window;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import com.bsreeinf.jobapp.R;
 
 import java.io.File;
+import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -199,5 +205,30 @@ public class Commons {
             return true;
         }
         return false;
+    }
+
+    public static class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
+        ImageView bmImage;
+
+        public DownloadImageTask(ImageView bmImage) {
+            this.bmImage = bmImage;
+        }
+
+        protected Bitmap doInBackground(String... urls) {
+            String urldisplay = urls[0];
+            Bitmap mIcon11 = null;
+            try {
+                InputStream in = new java.net.URL(urldisplay).openStream();
+                mIcon11 = BitmapFactory.decodeStream(in);
+            } catch (Exception e) {
+                Log.e("Error", e.getMessage());
+                e.printStackTrace();
+            }
+            return mIcon11;
+        }
+
+        protected void onPostExecute(Bitmap result) {
+            bmImage.setImageBitmap(result);
+        }
     }
 }

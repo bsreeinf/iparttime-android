@@ -159,7 +159,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginRight="15dp"
                         android:background="@color/white"
-                        android:hint="yourname@email.com"
+                        android:hint="Email"
                         android:imeOptions="actionNext"
                         android:inputType="textEmailAddress"
                         android:maxLines="1"
@@ -257,7 +257,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="gone">
 
                 <View
                     android:layout_width="match_parent"

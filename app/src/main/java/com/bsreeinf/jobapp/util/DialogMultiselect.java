@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 
 import com.bsreeinf.jobapp.MainActivity;
@@ -109,6 +108,12 @@ public class DialogMultiselect extends DialogFragment {
                         dialog.cancel();
                     }
                 });
+        builder1.setNeutralButton("Clear", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                resetChecks();
+            }
+        });
 
         dialog = builder1.create();
         return dialog;
@@ -148,6 +153,12 @@ public class DialogMultiselect extends DialogFragment {
                     }
                 }
             });
+        }
+    }
+
+    private void resetChecks(){
+        for (int i = 0; i < listItems.getChildCount(); i++) {
+            ((CheckBox) listItems.getChildAt(i)).setChecked(false);;
         }
     }
 }

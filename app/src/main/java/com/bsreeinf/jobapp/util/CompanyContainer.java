@@ -44,6 +44,7 @@ public class CompanyContainer {
         private String phone;
         private String email;
         private String address;
+        private String logo_url;
 
         public Company(JsonObject company) {
             this.id = company.get("id").getAsInt();
@@ -51,6 +52,7 @@ public class CompanyContainer {
             this.phone = company.get("phone").getAsString();
             this.email = company.get("email").getAsString();
             this.address = ""; //company.get("address") == null ? "" : company.get("address").getAsString();
+            this.logo_url = company.get("logo").getAsString();
         }
 
         public int getId() {
@@ -71,6 +73,10 @@ public class CompanyContainer {
 
         public String getAddress() {
             return address;
+        }
+
+        public String getLogo_url() {
+            return logo_url;
         }
     }
 }

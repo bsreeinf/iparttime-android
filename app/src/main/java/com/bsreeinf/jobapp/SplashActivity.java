@@ -28,7 +28,6 @@ import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 
 public class SplashActivity extends Activity {
-    private static final String IS_FIRST_APP_USE = "is_first_app_use";
     private static final String TAG = "SplashActivity";
 
     private ViewFlipper viewFlipper;
@@ -48,6 +47,7 @@ public class SplashActivity extends Activity {
     private Typeface font, fontBold;
 
     private SharedPreferences prefs;
+    private SharedPreferences.Editor prefEdit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +56,7 @@ public class SplashActivity extends Activity {
         setContentView(R.layout.activity_splash);
         context = this;
         prefs = Commons.getSharedPreferences(context);
+        prefEdit = Commons.getEditor(context);
         font = Typeface.createFromAsset(context.getAssets(), "fonts/Ubuntu-L.ttf");
         fontBold = Typeface.createFromAsset(context.getAssets(), "fonts/Ubuntu-B.ttf");
 
@@ -95,7 +96,7 @@ public class SplashActivity extends Activity {
     }
 
     private void init() {
-        showCoachMarks = prefs.getBoolean(IS_FIRST_APP_USE, true);
+        showCoachMarks = prefs.getBoolean(Commons.IS_FIRST_APP_USE, true);
         layoutPagination = (LinearLayout) findViewById(R.id.layoutPagination);
         viewFlipper = (ViewFlipper) findViewById(R.id.viewFlipper);
         txtEmail = (EditText) findViewById(R.id.txtEmail);
@@ -105,12 +106,11 @@ public class SplashActivity extends Activity {
         txtPassword.setTypeface(font);
 
         viewCount = viewFlipper.getChildCount();
-        if (!showCoachMarks) {
+        if (showCoachMarks) {
             addPagination();
             setSelectedPage(0);
-            SharedPreferences.Editor prefEditor = Commons.getEditor(context);
-            prefEditor.putBoolean(Commons.IS_FIRST_APP_USE, true);
-            prefEditor.commit();
+            prefEdit.putBoolean(Commons.IS_FIRST_APP_USE, false);
+            prefEdit.commit();
         } else {
             for (int i = 0; i < viewCount - 1; i++)
                 viewFlipper.showNext();
@@ -150,17 +150,14 @@ public class SplashActivity extends Activity {
 
     private void execLogin(String email, String password) {
         final ProgressDialog progress = Commons.getCustomProgressDialog(context);
-        JsonObject requestJson = new JsonObject();
         strEmail = email;
         strPassword = password;
-        requestJson.addProperty("email", email);
-        requestJson.addProperty("password", password);
-        Log.d("Ion Request", "Request Json is : " + requestJson.toString());
         Ion.with(getApplicationContext())
                 .load(Commons.HTTP_GET, Commons.URL_LOGIN)
                 .setLogging("Ion Request", Log.DEBUG)
                 .followRedirect(true)
-                .setJsonObjectBody(requestJson)
+                .setBodyParameter("email", email)
+                .setBodyParameter("password", password)
                 .asJsonObject()
                 .setCallback(new FutureCallback<JsonObject>() {
                     @Override

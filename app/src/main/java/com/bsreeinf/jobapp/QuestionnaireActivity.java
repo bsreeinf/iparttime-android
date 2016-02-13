@@ -24,7 +24,6 @@ import com.bsreeinf.jobapp.util.Commons;
 import com.bsreeinf.jobapp.util.JobsContainer;
 import com.bsreeinf.jobapp.util.Questionnaire;
 import com.bsreeinf.jobapp.util.SavedAppliedJobsContainer;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
@@ -44,16 +43,15 @@ public class QuestionnaireActivity extends Activity {
     private Map<Integer, Integer> answers;
     private Map<Integer, LinearLayout> refOptions;
     private int questionCount;
-    private float lastTouch;
     private ViewFlipper viewFlipper;
     private LinearLayout layoutSummary;
     private int viewCount;
     private TextView layoutPagination;
+    private LinearLayout layoutPrevNext;
     private int entry_a;
     private int exit_a;
     private int entry_b;
     private int exit_b;
-
 
     public QuestionnaireActivity() {
     }
@@ -87,12 +85,12 @@ public class QuestionnaireActivity extends Activity {
         fontBold = Typeface.createFromAsset(context.getAssets(), "fonts/Raleway-Bold.ttf");
         answers = new HashMap<>();
         refOptions = new HashMap<>();
-//        requestQuestionnaire();
-
 
         viewFlipper = (ViewFlipper) findViewById(R.id.layoutQuestionnaire);
         layoutSummary = (LinearLayout) findViewById(R.id.layoutSummary);
         layoutPagination = (TextView) findViewById(R.id.layoutPagination);
+        layoutPrevNext = (LinearLayout) findViewById(R.id.layoutPrevNext);
+
 
         renderQuestionnaire(job.getQuestionnaire());
 
@@ -131,7 +129,6 @@ public class QuestionnaireActivity extends Activity {
                 }
             });
             layoutSummary.addView(layoutAnswer);
-            //
 
             LinearLayout layoutQuestion = (LinearLayout) LayoutInflater
                     .from(context)
@@ -171,9 +168,9 @@ public class QuestionnaireActivity extends Activity {
                         } else {
                             try {
                                 refOptions.get(finalI).findViewById(R.id.lytBack).setBackgroundColor(Color.WHITE);
-                                ((TextView)refOptions.get(finalI).findViewById(R.id.txtOption)).setTextColor(ContextCompat.getColor(context,
+                                ((TextView) refOptions.get(finalI).findViewById(R.id.txtOption)).setTextColor(ContextCompat.getColor(context,
                                         R.color.app_dark_gray));
-                            }catch (Exception e){
+                            } catch (Exception e) {
                                 e.printStackTrace();
                             }
 
@@ -182,7 +179,7 @@ public class QuestionnaireActivity extends Activity {
 
                             refOptions.get(finalI).findViewById(R.id.lytBack).setBackgroundColor(ContextCompat.getColor(context,
                                     R.color.pallet_coral_red_light));
-                            ((TextView)refOptions.get(finalI).findViewById(R.id.txtOption)).setTextColor(Color.WHITE);
+                            ((TextView) refOptions.get(finalI).findViewById(R.id.txtOption)).setTextColor(Color.WHITE);
 
                             answers.put(finalI, question.getOption(finalJ).getId());
                             ((TextView) layoutSummary.getChildAt(finalI).findViewById(R.id.lblQuestion))
@@ -212,7 +209,6 @@ public class QuestionnaireActivity extends Activity {
         viewCount = viewFlipper.getChildCount();
         setSelectedPage(0);
 
-
         Button btnPrevQuestion = (Button) findViewById(R.id.btnPrevQuestion);
         Button btnNextQuestion = (Button) findViewById(R.id.btnNextQuestion);
         btnPrevQuestion.setOnClickListener(new View.OnClickListener() {
@@ -229,36 +225,64 @@ public class QuestionnaireActivity extends Activity {
         });
     }
 
-    private void requestQuestionnaire() {
-        final ProgressDialog progress = Commons.getCustomProgressDialog(context);
-        Ion.with(getApplicationContext())
-                .load(Commons.HTTP_GET, Commons.URL_QUESTIONNAIRE)
-                .setLogging("Ion Request", Log.DEBUG)
-                .followRedirect(true)
-                .setBodyParameter("job_id", job.get_id() + "")
-                .setBodyParameter("user_id", Commons.currentUser.getId() + "")
-//                .setJsonObjectBody(requestJson)
-                .asJsonArray()
-                .setCallback(new FutureCallback<JsonArray>() {
-                    @Override
-                    public void onCompleted(Exception e, JsonArray result) {
-                        Log.d("Ion Request", "Completed");
-                        progress.dismiss();
-                        if (e != null) {
-                            e.printStackTrace();
-                            return;
-                        }
-                        if (Commons.SHOW_DEBUG_MSGS)
-                            Log.d(TAG, "Ion Request " + result.toString());
-                        if (Commons.SHOW_TOAST_MSGS)
-                            Toast.makeText(context, "Ion Request " + result.toString(),
-                                    Toast.LENGTH_LONG).show();
-                        if (result.size() == 1) {
-                            if (result.get(0).getAsJsonObject().has("response_status")) {
-                                if (result.get(0).getAsJsonObject().get("response_status").getAsString().equals("attempt_failed")) {
+    private void submitJobApplication() {
+        if (questionCount != answers.size()) {
+            Toast.makeText(context, "Answer all questions", Toast.LENGTH_SHORT).show();
+            Log.d(TAG, "Q Count : " + questionCount + "\n Answer given : " + answers.size());
+            return;
+        }
+        String strAnswer = null;
+        for (Iterator i = answers.keySet().iterator(); i.hasNext(); ) {
+            strAnswer = (strAnswer == null ? "" : strAnswer + "||||") + "" + answers.get(i.next());
+        }
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        final TextView txtURL = new TextView(context);
+        builder.setView(txtURL);
+        builder.setMessage("Are you sure you want to apply for this job?");
+
+        final String finalStrAnswer = strAnswer;
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                final ProgressDialog progress = Commons.getCustomProgressDialog(context);
+                JsonObject requestJson = new JsonObject();
+                requestJson.addProperty("user_id", Commons.currentUser.getId());
+                requestJson.addProperty("job_id", job.get_id());
+                requestJson.addProperty("questionnaire_answers", finalStrAnswer);
+                requestJson.addProperty("job_status_id", SavedAppliedJobsContainer.JOB_STATUS_APPLIED);
+                JsonObject finalRequest = new JsonObject();
+                finalRequest.add("saved_applied_job", requestJson);
+
+                Log.d("Ion Request", "Request Json is : " + requestJson.toString());
+                Ion.with(getApplicationContext())
+                        .load(Commons.HTTP_POST, Commons.URL_SAVE_APPLY_JOB)
+                        .setLogging("Ion Request", Log.DEBUG)
+                        .followRedirect(true)
+                        .setJsonObjectBody(finalRequest)
+                        .asJsonObject()
+                        .setCallback(new FutureCallback<JsonObject>() {
+                            @Override
+                            public void onCompleted(Exception e, JsonObject result) {
+                                Log.d("Ion Request", "Completed");
+                                progress.dismiss();
+                                if (e != null) {
+                                    e.printStackTrace();
+                                    return;
+                                }
+                                if (Commons.SHOW_DEBUG_MSGS)
+                                    Log.d(TAG, "Ion Request " + result.toString());
+                                if (Commons.SHOW_TOAST_MSGS)
+                                    Toast.makeText(context, "Ion Request " + result.toString(),
+                                            Toast.LENGTH_LONG).show();
+                                if (result.has("response_status")) {
+                                    String status = result.get("response_status").getAsString();
                                     AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                                    builder.setMessage("You have attempted this questionnaire before and failed." +
-                                            "\nYou may not apply for this job again");
                                     builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
@@ -266,129 +290,23 @@ public class QuestionnaireActivity extends Activity {
                                             finish();
                                         }
                                     });
+                                    if (status.equals("failed")) {
+                                        builder.setMessage("You have failed the questionnaire." +
+                                                "\nYou may not apply for this job again");
+                                    } else if (status.equals("exists")) {
+                                        builder.setMessage("You have already applied for this job");
+                                    }
                                     builder.create().show();
+                                } else {
+                                    Toast.makeText(context, "Applied for job", Toast.LENGTH_LONG).show();
+                                    finish();
                                 }
                             }
-                        }
-                        renderQuestionnaire(new Questionnaire(result));
-                    }
-                });
-    }
-
-    private void submitJobApplication() {
-        if (questionCount != answers.size()) {
-            Toast.makeText(context, "Answer all questions", Toast.LENGTH_SHORT).show();
-            Log.d(TAG, "Q Count : " + questionCount + "\n Answer given : " + answers.size());
-            return;
-        } else {
-            String strAnswer = null;
-            for (Iterator i = answers.keySet().iterator(); i.hasNext(); ) {
-                strAnswer = (strAnswer == null ? "" : strAnswer + "||||") + "" + answers.get(i.next());
+                        });
             }
-            AlertDialog.Builder builder = new AlertDialog.Builder(context);
-            final TextView txtURL = new TextView(context);
-            builder.setView(txtURL);
-            builder.setMessage("Are you sure you want to apply for this job?");
-
-            final String finalStrAnswer = strAnswer;
-            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                }
-            });
-            builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    final ProgressDialog progress = Commons.getCustomProgressDialog(context);
-                    JsonObject requestJson = new JsonObject();
-                    requestJson.addProperty("user_id", Commons.currentUser.getId());
-                    requestJson.addProperty("job_id", job.get_id());
-                    requestJson.addProperty("questionnaire_answers", finalStrAnswer);
-                    requestJson.addProperty("job_status_id", SavedAppliedJobsContainer.JOB_STATUS_APPLIED);
-                    JsonObject finalRequest = new JsonObject();
-                    finalRequest.add("saved_applied_job", requestJson);
-
-                    Log.d("Ion Request", "Request Json is : " + requestJson.toString());
-                    Ion.with(getApplicationContext())
-                            .load(Commons.HTTP_POST, Commons.URL_SAVE_APPLY_JOB)
-                            .setLogging("Ion Request", Log.DEBUG)
-                            .followRedirect(true)
-                            .setJsonObjectBody(finalRequest)
-                            .asJsonObject()
-                            .setCallback(new FutureCallback<JsonObject>() {
-                                @Override
-                                public void onCompleted(Exception e, JsonObject result) {
-                                    Log.d("Ion Request", "Completed");
-                                    progress.dismiss();
-                                    if (e != null) {
-                                        e.printStackTrace();
-                                        return;
-                                    }
-                                    if (Commons.SHOW_DEBUG_MSGS)
-                                        Log.d(TAG, "Ion Request " + result.toString());
-                                    if (Commons.SHOW_TOAST_MSGS)
-                                        Toast.makeText(context, "Ion Request " + result.toString(),
-                                                Toast.LENGTH_LONG).show();
-                                    if (result.has("response_status")) {
-                                        String status = result.get("response_status").getAsString();
-                                        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                                        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                dialog.dismiss();
-                                                finish();
-                                            }
-                                        });
-                                        if (status.equals("failed")) {
-                                            builder.setMessage("You have failed the questionnaire." +
-                                                    "\nYou may not apply for this job again");
-                                        } else if (status.equals("exists")) {
-                                            builder.setMessage("You have already applied for this job");
-                                        }
-                                        builder.create().show();
-                                    } else {
-                                        Toast.makeText(context, "Applied for job", Toast.LENGTH_LONG).show();
-                                    }
-                                }
-                            });
-                }
-            });
-            builder.create().show();
-        }
-
+        });
+        builder.create().show();
     }
-
-//    @Override
-//    public boolean onTouchEvent(MotionEvent event) {
-//        switch (event.getAction()) {
-//            case MotionEvent.ACTION_DOWN:
-//                lastTouch = event.getY();
-//                break;
-//            case MotionEvent.ACTION_UP:
-//                float currentTouch = event.getY();
-//                // Handling left to right screen swap.
-//                if (lastTouch < currentTouch) {
-//                    // If there aren't any other children, just break.
-//                    if (viewFlipper.getDisplayedChild() == 0)
-//                        break;
-//                    viewFlipper.setInAnimation(context, entry_b);
-//                    viewFlipper.setOutAnimation(context, exit_b);
-//                    viewFlipper.showPrevious();
-//                    setSelectedPage(viewFlipper.getDisplayedChild());
-//                }
-//                if (lastTouch > currentTouch) {
-//                    if (viewFlipper.getDisplayedChild() == viewCount - 1)
-//                        break;
-//                    viewFlipper.setInAnimation(context, entry_a);
-//                    viewFlipper.setOutAnimation(context, exit_a);
-//                    viewFlipper.showNext();
-//                    setSelectedPage(viewFlipper.getDisplayedChild());
-//                }
-//                break;
-//        }
-//        return false;
-//    }
 
     private void viewPrevQuestion() {
         if (viewFlipper.getDisplayedChild() == 0)
@@ -411,10 +329,13 @@ public class QuestionnaireActivity extends Activity {
     private void setSelectedPage(int index) {
         if (index == viewCount - 1) {
             layoutPagination.setText("");
-//            layoutPagination.setVisibility(View.GONE);
+            layoutPrevNext.setVisibility(View.INVISIBLE);
+            if (questionCount == answers.size()) {
+                Toast.makeText(context, "Please click on Apply", Toast.LENGTH_SHORT).show();
+            }
         } else {
-//            layoutPagination.setVisibility(View.VISIBLE);
             layoutPagination.setText("Question " + (index + 1) + " of " + (viewCount - 1));
+            layoutPrevNext.setVisibility(View.VISIBLE);
         }
     }
 }
