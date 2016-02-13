@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bsreeinf.jobapp.R;
@@ -43,6 +44,7 @@ public class JobsAdapter extends ArrayAdapter<SimpleContainer> {
             holder.txtCompany = (TextView) convertView.findViewById(R.id.lblCompany);
             holder.txtSalary = (TextView) convertView.findViewById(R.id.lblSalary);
             holder.txtSalaryType = (TextView) convertView.findViewById(R.id.lblSalaryType);
+            holder.imgCompanyLogo = (ImageView) convertView.findViewById(R.id.imgCompanyLogo);
 
             convertView.setTag(holder);
         } else {
@@ -59,6 +61,10 @@ public class JobsAdapter extends ArrayAdapter<SimpleContainer> {
         jobDescription = jobDescription.length() > 40 ? jobDescription.substring(0, 30) + " ..." : jobDescription;
         holder.txtJobDescription.setText(jobDescription);
         holder.txtSalary.setText("\u20B9 " + currBlock.getSalary_offered());
+        if (!Commons.companyList.getCompanyByID(currBlock.getCompany_id()).getLogo_url().trim().equals("")) {
+            new Commons.DownloadImageTask(holder.imgCompanyLogo)
+                    .execute(Commons.companyList.getCompanyByID(currBlock.getCompany_id()).getLogo_url().trim());
+        }
 
         String salaryType;
         switch (currBlock.getSalary_type()) {
@@ -106,5 +112,6 @@ public class JobsAdapter extends ArrayAdapter<SimpleContainer> {
 
     private class ViewHolder {
         public TextView txtTitle, txtJobLocation, txtPostDate, txtJobDescription, txtCompany, txtSalary, txtSalaryType;
+        public ImageView imgCompanyLogo;
     }
 }
